@@ -1,24 +1,17 @@
-I've selected a "Camera Surveillance System" template of the "CM3065 Intelligent Signal Processing" course.
+I'm passionate about computer vision and I'm pretty paranoid about my home security. This is the reason why i've chosen a "Camera Surveillance System" template for my final project. I personally have a few security cameras at home because I want to know what is happening at home when I'm not there. I use these Xiaomi cameras to monitor the situation inside and Arlo doorbell camera outside. Both of these surveillance systems come with subscription-based cloud services that allow users to view the live video and recordings via convenient mobile apps. They also detect motions and send push notifications to alert users about any events when they are away from home.
 
-The reason why I've selected this template is that I'm interested in the field of computer vision and home security.
+These and other similar commercial surveillance solutions worked well for me and other users. But there are some drawbacks. First, these services are paid and charge a monthly fee depending on the number of cameras and the number of days of video storage. It could be quite expensive if you have many cameras and want to store the recordings for a long period of time.
 
-I personally have a few security cameras at home because I want to know what is happening at home when I'm not there.
-These cameras come with a mobile app that allows me to view the live video from the cameras and also to view the recorded videos.
-These videos are stored in the cloud provided by the camera manufacturer.
-And these services worked well for me for many years. It is a really easy to use.
+Second, the recordings are stored in a private cloud in unknown jurisdiction. It's not clear who has access to the videos so it arises some privacy concerns. Some of the vendors have been even accused of spying on their customers. Moreover, IoT devices are known to be vulnerable to cyber attacks due to the short support life cycle and the lack of security updates.
 
-But these are some concerns about these services.
-First, these service are paid and charge a monthly fee depending on the number of cameras and the number of days of video storage.
-It could be quite expensive if you have many cameras and want to store the videos for a long time.
+An alternative solution that addresses these concerns is to use a local storage to store the recording instead of the private cloud services. There is an abundance of free open source software that can be used to build a camera surveillance systems using a local storage, such as Kerberos, Motion, Shinobi, ZoneMinder, and many others. Even entire operating systems such as MotionEyeOS dedicated to this single purpose.
 
-Second, the videos are stored in a private cloud in unknown jurisdiction. It's not clear who has access to the videos so it arises some privacy concerns.
-For many users it could be a deal breaker if someone else can view the live video from inside of their home.
-Moreover, some of these services has been hacked in the past and the videos were leaked to the public.
+But they mostly rely on the web interface and lack of convenience of the mobile apps. Also, they are not as easy to set up and require some technical skills. For example, many installation guides suggest to use Docker or Docker Compose to run the software. And this is not a trivial task to connect cameras to the Docker container. So, it's definitely not a plug-and-play solution, like it used to be with the commercial services.
 
-An alternative solution that addresses these concerns is to use a local storage to store the videos instead of the cloud.
-There are free open source software that can be used to build a camera surveillance system with a local storage such as [Kerberos](https://doc.kerberos.io/).
+On the other hand, the commercial cloud services are easy to install and use, usually have convenient mobile apps, but they are paid and raise security and privacy concerns. The local storage solutions are usually free and open source, usually don't have security and privacy issues but they are not as easy to install and use, don't have convenient mobile apps, rely mainly on the web interface.
 
-While these software are pretty mature and have many features, they are not as easy to use as the commercial services.
-They require some technical knowledge to setup and maintain. Additionally, these software usually have a web interface to view the videos which lacks the convenience of the mobile app.
+To address these issues, I propose to build a free and open source software that will combine the best of both worlds. Just like the mentioned projects, this pice of software will be free and open source  suitable to run on a home server or a Raspberry Pi with connected cameras and storage. Just like the mentioned projects, this pice of software will provide a set of most common features such as recording, and live video streaming, motion detection, and push notifications about events.
 
-So I want to build a camera surveillance system that addresses these problems by using the local storage to store the videos and I would like to accompany this system with a convenient mobile app to view the videos similar to the commercial services.
+But unlike the mentioned projects, it will be easy to install and use. The goal is to make it easy to install for non-technical users. Most likely, it will be a single binary file or a pip package that can be run on any Unix system. It will not require Docker or any other sophisticated software to run.
+
+Another big difference is that it will have a convenient mobile app that will allow users to view the live video and recordings. It's much more convenient than using a web interface, especially when you are away from home and only have a smartphone with you.
