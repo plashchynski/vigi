@@ -1,7 +1,10 @@
+from flask_bootstrap import Bootstrap5
 from flask import Flask, Response, render_template
 import cv2
 
 app = Flask(__name__)
+bootstrap = Bootstrap5(app)
+
 camera = cv2.VideoCapture(0)  # Use 0 for the first webcam
 
 # generator function that yields frames
