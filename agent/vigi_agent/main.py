@@ -1,11 +1,13 @@
 from flask_bootstrap import Bootstrap5
 from flask import Flask, Response, render_template
+from .motion_detector import MotionDetector
 import cv2
 
 app = Flask(__name__)
 bootstrap = Bootstrap5(app)
 
 camera = cv2.VideoCapture(0)  # Use 0 for the first webcam
+motion_detector = MotionDetector()
 
 # generator function that yields frames
 def generate_frames():
@@ -14,6 +16,7 @@ def generate_frames():
         if not success:
             break
         else:
+            frame = motion_detector.update(frame)
             ret, buffer = cv2.imencode('.jpg', frame)
             frame = buffer.tobytes()
             yield (b'--frame\r\n'

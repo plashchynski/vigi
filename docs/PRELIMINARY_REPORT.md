@@ -188,6 +188,11 @@ The final evaluation will involve implementing an evaluation scenario with descr
 
 ## Feature Prototype
 
+Two features of the system that are considered to be the most challenging and crucial for the project are the streaming module and the motion detection module. To reduce the risk of failure, these features should be implemented first at lest in their minimal form. The aim of this prototype is to assess the feasibility of the project and to identify the most suitable approaches for implementing these features.
+
+The first prototype was implemented as an agent that provides a basic web console with a live video feed from a single camera and a basic motion detection functionality. The agent is implemented as a Flask application that runs on a local server with a connected camera. The agent uses the OpenCV library to connect to the camera and fetch the video stream as discrete frames. These frames are then processed by the motion detection module, which uses a simple background subtraction algorithm to detect motion in the video stream. When the motion is detected, the agent displays a bounding box around the moving object and saves the video clip of the event on the disk.
+
+During the development of this prototype, it was found that the basic variant of live video streaming using the Flask application is to provide an endpoint that returns a continuous stream of frames as JPEG images. The client displays these images as a video. This approach is far simpler than using the streaming protocols, such as HLS, but has limitations in terms of network overhead and latency. But for the purpose of this prototype, it was found to be sufficient.
 
 ## References
 [1] Hussien, H.M., Meko, S.F., Teshale, N.B. 2018. Comparative Analysis of Moving Object Detection Algorithms. Lecture Notes of the Institute for Computer Sciences, Social Informatics and Telecommunications Engineering, vol 244. Springer, Cham. Retrieved from https://doi.org/10.1007/978-3-319-95153-9_16.
