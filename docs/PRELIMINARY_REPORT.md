@@ -85,9 +85,7 @@ Also, the article does not provide information on software or hardware compatibi
 
 Another open-source surveillance software that is worth mentioning is ZoneMinder. It is one of the most feature-rich solutions available on the market, used primarily in professional settings, but can also run on a home server. It provides a web interface, as well as Android and iOS apps. It can utilize virtually any number of cameras of any type, including infrared cameras. There is an impressive list of features, including advanced AI powered detection, cloud and local storage, and many others. It is a mature project with a large community and a number of commercial partners.
 
-As for MotionPlus, ZoneMinder and other open-source solutions have tendencies to accumulate complexity over time. As a general-purpose, fit-for-all solution, it comes with a lot of features that are not relevant to the home users, targeting primarily enterprise customers. Also, some of the features are available only in the paid version. The installation and configuration process is quite complex and requires advanced technical skills. It is not very suitable for non-technical users.
-
-
+As for MotionPlus, ZoneMinder and other open-source solutions have tendencies to accumulate complexity over time. As a general-purpose, fit-for-all solution, it comes with a lot of features that may not be relevant to the home users, targeting primarily enterprise customers. Also, some of the features are available only in the paid version. The installation and configuration of ZoneMinder is not a trivial task and requires advanced technical skills.
 
 # Design
 
