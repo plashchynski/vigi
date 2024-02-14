@@ -161,3 +161,6 @@ cython_debug/
 
 # MacOS X stuff
 .DS_Store
+
+# Ignore YOLOv8 weights
+agent/yolov8n.pt
