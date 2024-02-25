@@ -27,6 +27,10 @@ wget https://github.com/ultralytics/assets/releases/download/v8.1.0/yolov8n.pt
 
 ## Run unit tests
 
+Download a samples dataset for the motion detection tests from [here](https://drive.google.com/file/d/16yQZuHf3xB-Z6zYG6lGxxMP1umbxlIYd/view?usp=sharing) and extract it to the `agent/tests` directory.
+
+Then run the tests:
+
 ```bash
 cd agent
 python -m unittest tests/*.py
