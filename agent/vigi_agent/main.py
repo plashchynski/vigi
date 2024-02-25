@@ -1,3 +1,5 @@
+import configparser
+
 import cv2
 from flask_bootstrap import Bootstrap5
 from flask import Flask, Response, render_template
@@ -13,6 +15,13 @@ bootstrap = Bootstrap5(app)
 # Initialize the camera with OpenCV
 print("Starting camera... ", end="", flush=True)
 camera = cv2.VideoCapture(0)  # Use 0 for the first webcam
+print("done!", flush=True)
+
+# Read the configuration file
+print("Reading the configuration file... ", end="", flush=True)
+config = configparser.ConfigParser()
+config.read('vigi.ini')
+app.user_config = config['DEFAULT']
 print("done!", flush=True)
 
 # This callback will be called when motion is detected
