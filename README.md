@@ -1,4 +1,4 @@
-# ViGi — A camera surveillance system
+# ViGi: A camera surveillance system
 
 ## Requirements
 
@@ -7,7 +7,7 @@
 - Camera (webcam or IP camera) that can be accessed via OpenCV
 - A server hardware (Raspberry Pi, PC, etc.) to run the agent
 
-## Run from source
+## Run from the sources
 
 ```bash
 # Set up a virtual environment
@@ -23,4 +23,11 @@ wget https://github.com/ultralytics/assets/releases/download/v8.1.0/yolov8n.pt
 
 # run the agent
 .venv/bin/flask --debug --app vigi_agent.main run
+```
+
+## Run unit tests
+
+```bash
+cd agent
+python -m unittest tests/*.py
 ```

@@ -46,6 +46,7 @@ class MotionDetectorTestCase(unittest.TestCase):
         # negative samples are videos that do not contain any real motion, but rather static scenes
         # with some noise or light changes
         for file in glob(os.path.join(os.path.dirname(__file__), 'samples', 'negative', '*.mov')):
+            print(f"Testing file: {file} that should not contain any motion")
             processor = FileProcessor(file)
             processor.process()
 
@@ -53,6 +54,7 @@ class MotionDetectorTestCase(unittest.TestCase):
 
         # positive samples are videos that contain real motion
         for file in glob(os.path.join(os.path.dirname(__file__), 'samples', 'positive', '*.mov')):
+            print(f"Testing file: {file} that should contain motion")
             processor = FileProcessor(file)
             processor.process()
 

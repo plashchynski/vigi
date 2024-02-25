@@ -1,45 +1,106 @@
 import cv2
+import numpy as np
+from ultralytics import YOLO
+
+from vigi_agent.spatial import boxes_intersect
+from vigi_agent.drawing import draw_bboxes, draw_bbox, draw_title
 
 class MotionDetector():
-    def __init__(self, min_area = 500):
-        self.fgbg = cv2.createBackgroundSubtractorMOG2(varThreshold=50)
-        self.min_area = min_area
+    def __init__(self, motion_callback, debug=False):
+        self.back_sub = cv2.createBackgroundSubtractorMOG2(varThreshold=100, detectShadows=True)
+        self.motion_callback = motion_callback
+        self.motion_detected = False
+        self.debug = debug
+        self.skip_frames_count = 50 # warming up frames count
+        self.yolo = YOLO('yolov8n.pt')
 
     def update(self, frame):
         original_frame = frame.copy()
 
-        # Convert frame to grayscale and blur it
-        blured_frame = cv2.GaussianBlur(frame, (21, 21), 0)
-        fg_mask = self.fgbg.apply(blured_frame)
+        # convert the current frame to grayscale
+        gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-        # # Threshold the foreground mask to remove the shadows
-        # _, fg_mask = cv2.threshold(fg_mask, 100, 255, cv2.THRESH_BINARY)
+        # update the background model to get the foreground mask
+        fg_mask = self.back_sub.apply(gray_frame)
 
-        # # Apply morphological operations to remove corruptions:
-        # kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
-        # fg_mask = cv2.morphologyEx(fg_mask, cv2.MORPH_CLOSE, kernel, iterations=2)
+        # Warming up the model by skipping the first few frames
+        if self.skip_frames_count > 0:
+            self.skip_frames_count -= 1
 
-        # # Find the contours of the detected objects:
-        # contours, _ = cv2.findContours(fg_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            draw_title(original_frame, 'WARMING UP')
+            return original_frame
 
-        # # Filter out the contours that are too small to be a car:
-        # contours = [c for c in contours if cv2.contourArea(c) > self.min_area]
+        # threshold the mask, the min_thresh value is set to 100
+        # this value roughly impacts the sensitivity of the motion detection
+        min_thresh = 100
+        _, motion_mask = cv2.threshold(fg_mask, thresh = min_thresh, maxval = 255, type = cv2.THRESH_BINARY)
 
-        # # Convex hull to get clean contours without holes:
-        # contours = [cv2.convexHull(c) for c in contours]
+        # median blur to remove granular noise
+        motion_mask = cv2.medianBlur(motion_mask, ksize = 3)
 
-        # # Prepare bounding boxes for the tracker
-        # bboxes = []
+        # morphological operations to fill in holes
+        kernel = np.array((15,15), dtype=np.uint8)
 
-        # # Get the bounding boxes of the contours:
-        # for contour in contours:
-        #     (x, y, w, h) = cv2.boundingRect(contour)
+        # morphologyEx with MORPH_OPEN is the same as erode followed by dilate
+        motion_mask = cv2.morphologyEx(motion_mask, op = cv2.MORPH_OPEN, kernel = kernel, iterations = 1)
 
-        #     bboxes.append([x, y, x+w, y+h])
+        # morphologyEx with MORPH_CLOSE is the same as dilate followed by erode
+        motion_mask = cv2.morphologyEx(motion_mask, op = cv2.MORPH_CLOSE, kernel = kernel, iterations = 1)
 
+        # get contours of the moving objects in the frame
+        contours, _ = cv2.findContours(motion_mask, mode = cv2.RETR_EXTERNAL, method = cv2.CHAIN_APPROX_SIMPLE)
+        detections = []
 
-        # for [x,y,x2,y2] in bboxes:
-        #     # Draw the bounding box around the detected object
-        #     cv2.rectangle(original_frame, (x, y), (x2, y2), (0, 255, 0), 1)
+        cnt_area_thresh = 5000
+        for cnt in contours:
+            x, y, w, h = cv2.boundingRect(cnt)
+            area = cv2.contourArea(cnt)
+            if area > cnt_area_thresh:
+                detections.append([x, y, x + w, y + h])
 
-        return fg_mask
+        detections = np.array(detections)
+        
+        if len(detections) > 0:
+            # Motion detected!
+            if self.motion_detected == False:
+                self.motion_detected = True
+                self.motion_callback()
+
+            self.reset_motion_flag_after = 2 # frames
+
+            if self.debug:
+                draw_bboxes(original_frame, detections)
+        else:
+            if self.motion_detected:
+                if self.reset_motion_flag_after > 0:
+                    self.reset_motion_flag_after -= 1
+                else:
+                    self.motion_detected = False
+
+        if self.motion_detected:
+            # draw red rectangle on frame
+            cv2.rectangle(original_frame, (0, 0), (original_frame.shape[1], original_frame.shape[0]), (0, 0, 255), 10)
+            # draw text on frame
+            cv2.putText(original_frame, 'MOTION DETECTED', (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+
+        if self.motion_detected:
+            results = self.yolo(original_frame)
+
+            for result in results:
+                for box, cls in zip(result.boxes.xyxy, result.boxes.cls):
+                    label = result.names[int(cls)]
+
+                    if label != 'person':
+                        continue
+
+                    display = False
+
+                    # check if this box intersects with any of the detections
+                    for detection in detections:
+                        if boxes_intersect(box, detection):
+                            display = True
+
+                    if display:
+                        draw_bbox(original_frame, box, label=label)
+
+        return original_frame
