@@ -1,10 +1,9 @@
-import configparser
+from queue import Queue
 
 import cv2
+import zmq
 from flask_bootstrap import Bootstrap5
 from flask import Flask, Response, render_template
-
-from .motion_detector import MotionDetector
 
 # Initialize the Flask app
 app = Flask(__name__)
@@ -12,45 +11,21 @@ app = Flask(__name__)
 # Bootstrap wrapper for Flask
 bootstrap = Bootstrap5(app)
 
-# Initialize the camera with OpenCV
-print("Starting camera... ", end="", flush=True)
-camera = cv2.VideoCapture(0)  # Use 0 for the first webcam
-print("done!", flush=True)
-
-# Read the configuration file
-print("Reading the configuration file... ", end="", flush=True)
-config = configparser.ConfigParser()
-config.read('vigi.ini')
-app.user_config = config['DEFAULT']
-print("done!", flush=True)
-
-# This callback will be called when motion is detected
-def motion_callback():
-    print("Motion detected!")
-
-print("Starting the motion detector... ", end="", flush=True)
-motion_detector = MotionDetector(motion_callback)
-print("done!", flush=True)
-
 def generate_frames():
     """Generate frames from the camera and send them to the client."""
+    print("generate_frames called", flush=True)
+
+    stream = app.camera_monitor.frame_stream.subscribe()
+
     while True:
-        success, frame = camera.read()  # Read a frame from the camera
-        if not success:
-            print("Failed to read a frame from the camera")
-            break
-
-        else:
-            # Apply the motion detector to the frame
-            frame = motion_detector.update(frame)
-
-            # Convert the frame to JPEG
-            _ret, buffer = cv2.imencode('.jpg', frame)
-
-            # Send the JPEG frame to the client
-            frame = buffer.tobytes()
+        if not stream.empty():
+            frame = stream.get()
+            ret, jpeg = cv2.imencode('.jpg', frame)
+            frame_bytes = jpeg.tobytes()
             yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # Concatenate frame with header
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n\r\n')
+
+    app.camera_monitor.frame_stream.unsubscribe(stream)
 
 # route for video streaming
 @app.route('/camera')
@@ -61,6 +36,3 @@ def video_stream():
 @app.route('/')
 def index():
     return render_template('index.html')
-
-if __name__ == '__main__':
-    app.run(host='127.0.0.1', port=5000)
