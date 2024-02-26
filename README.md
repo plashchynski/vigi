@@ -22,7 +22,7 @@ pip install -r requirements.txt
 wget https://github.com/ultralytics/assets/releases/download/v8.1.0/yolov8n.pt
 
 # run the agent
-.venv/bin/flask --debug --app vigi_agent.main run
+python main.py
 ```
 
 ## Run unit tests
