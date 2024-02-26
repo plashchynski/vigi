@@ -13,19 +13,28 @@ bootstrap = Bootstrap5(app)
 
 def generate_frames():
     """Generate frames from the camera and send them to the client."""
-    print("generate_frames called", flush=True)
-
     stream = app.camera_monitor.frame_stream.subscribe()
 
-    while True:
-        if not stream.empty():
-            frame = stream.get()
-            ret, jpeg = cv2.imencode('.jpg', frame)
-            frame_bytes = jpeg.tobytes()
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n\r\n')
+    try:
+        while True:
+            if not stream.empty():
+                # Get the frame from the stream
+                frame = stream.get()
 
-    app.camera_monitor.frame_stream.unsubscribe(stream)
+                # Convert the frame to JPEG
+                _ret, jpeg = cv2.imencode('.jpg', frame)
+
+                # Convert the JPG to bytes
+                frame_bytes = jpeg.tobytes()
+
+                # Yield the frame to the client
+                yield (b'--frame\r\n'
+                    b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n\r\n')
+
+    except GeneratorExit:
+        # If the client disconnects, unsubscribe from the stream
+        app.camera_monitor.frame_stream.unsubscribe(stream)
+
 
 # route for video streaming
 @app.route('/camera')
