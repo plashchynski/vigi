@@ -1,7 +1,6 @@
 from queue import Queue
 
 import cv2
-import zmq
 from flask_bootstrap import Bootstrap5
 from flask import Flask, Response, render_template
 
