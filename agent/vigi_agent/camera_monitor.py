@@ -1,10 +1,12 @@
 import sys
 import threading
 import time
+import logging
 
 import cv2
 
 from .motion_detector import MotionDetector
+
 from .pub_sub import PubSub
 
 
@@ -13,11 +15,11 @@ class CameraMonitor(threading.Thread):
     A class that monitors the camera for motion and publishes the video stream from the camera.
     """
 
-    def __init__(self, camera_id=0, max_consecutive_errors=50):
+    def __init__(self, video_recorder = None, camera_id=0, max_errors=50):
         super().__init__()
 
         self.camera_id = camera_id
-        self.max_consecutive_errors = max_consecutive_errors
+        self.max_errors = max_errors
 
         # Initialize the PubSub object to stream the frames from the camera
         # so other parts of the application can access the stream of frames
@@ -26,18 +28,27 @@ class CameraMonitor(threading.Thread):
         # Initialize the motion detector, when motion is detected, the motion_callback will be called
         self.motion_detector = MotionDetector(motion_callback=self.motion_callback)
 
+        # video_recorder is used to save the video to a file when motion is detected
+        self.video_recorder = video_recorder
+
     def motion_callback(self):
-        print("Motion detected!")
+        logging.info("Motion detected!")
+        self.video_recorder.start_recording(frame_width=self.frame_width, frame_height=self.frame_height, fps=self.fps)
 
     def run(self):
         # Initialize the camera with OpenCV
-        print("Starting camera... ", end="", flush=True)
+        logging.info("Starting camera monitor... ")
         camera = cv2.VideoCapture(self.camera_id)  # Use 0 for the first webcam
         if camera.isOpened():
-            print("done!", flush=True)
+            logging.info("Camera opened successfully.")
         else:
-            print(f"Error: Camera with ID={self.camera_id} could not be opened.", file = sys.stderr)
+            logging.error(f"Camera with ID={self.camera_id} could not be opened.")
             return
+
+        self.frame_width = camera.get(cv2.CAP_PROP_FRAME_WIDTH)
+        self.frame_height = camera.get(cv2.CAP_PROP_FRAME_HEIGHT)
+        self.fps = camera.get(cv2.CAP_PROP_FPS)
+        logging.info(f"Camera parameters: frame width: {self.frame_width}, frame height: {self.frame_height}, FPS: {self.fps}")
 
         error_count = 0
         while True:
@@ -52,11 +63,11 @@ class CameraMonitor(threading.Thread):
                 # - print an error message and break the loop
 
                 error_count += 1
-                if error_count >= self.max_consecutive_errors:
-                    print(f"Error: Maximum number of consecutive errors ({self.max_consecutive_errors}) reached. Exiting.", file = sys.stderr)
+                if error_count >= self.max_errors:
+                    logging.fatal(f"Maximum number of consecutive errors ({self.max_errors}) reached. Exiting.")
                     break
 
-                print(f"Error: Failed to read a frame from the camera with ID={self.camera_id}", file = sys.stderr)
+                logging.error(f"Failed to read a frame from the camera with ID={self.camera_id}")
                 time.sleep(1)
                 continue
 
@@ -68,6 +79,15 @@ class CameraMonitor(threading.Thread):
 
             # Publish the frame to the frame stream
             self.frame_stream.publish(frame)
+
+            # if motion is not detected anymore and the video is being recorded, then stop the recording
+            if not self.motion_detector.is_motion_detected() and self.video_recorder.is_recording():
+                self.video_recorder.еnd_recording()
+
+            # here we send all frames to the video recorder, it's up to the video recorder to decide if
+            # it should record the frame or not. It could decide to record additional frames before and after
+            # the motion is detected
+            self.video_recorder.add_frame(frame)
 
         # OpenCV cleanup
         camera.release()

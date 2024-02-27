@@ -14,7 +14,16 @@ class MotionDetector():
         self.skip_frames_count = 50 # warming up frames count
         self.yolo = YOLO('yolov8n.pt')
 
+    def is_motion_detected(self) -> bool:
+        """
+        Returns True if motion is being detected, otherwise False.
+        """
+        return self.motion_detected
+
     def update(self, frame):
+        """
+        Update the motion detector with the current frame and return the frame with the motion detection overlay.
+        """
         original_frame = frame.copy()
 
         # convert the current frame to grayscale
