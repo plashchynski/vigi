@@ -34,4 +34,4 @@ class PubSub:
         """
         with self.lock:
             for subscriber in self.subscribers:
-                subscriber.put(message)
+                subscriber.put(message, block = False)

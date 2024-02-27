@@ -1,5 +1,3 @@
-from queue import Queue
-
 import cv2
 from flask_bootstrap import Bootstrap5
 from flask import Flask, Response, render_template
@@ -16,19 +14,18 @@ def generate_frames():
 
     try:
         while True:
-            if not stream.empty():
-                # Get the frame from the stream
-                frame = stream.get()
+            # Get the frame from the stream
+            frame = stream.get()
 
-                # Convert the frame to JPEG
-                _ret, jpeg = cv2.imencode('.jpg', frame)
+            # Convert the frame to JPEG
+            _ret, jpeg = cv2.imencode('.jpg', frame)
 
-                # Convert the JPG to bytes
-                frame_bytes = jpeg.tobytes()
+            # Convert the JPG to bytes
+            frame_bytes = jpeg.tobytes()
 
-                # Yield the frame to the client
-                yield (b'--frame\r\n'
-                    b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n\r\n')
+            # Yield the frame to the client
+            yield (b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n\r\n')
 
     except GeneratorExit:
         # If the client disconnects, unsubscribe from the stream
