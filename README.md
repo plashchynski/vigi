@@ -33,5 +33,5 @@ Then run the tests:
 
 ```bash
 cd agent
-python -m unittest tests/*.py
+python -m unittest tests/**/*.py
 ```
