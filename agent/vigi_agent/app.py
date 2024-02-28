@@ -2,7 +2,7 @@ from datetime import datetime
 import cv2
 import numpy as np
 from flask_bootstrap import Bootstrap5
-from flask import Flask, Response, render_template
+from flask import Flask, Response, render_template, redirect, url_for
 
 # Initialize the Flask app
 app = Flask(__name__)
@@ -46,13 +46,13 @@ def generate_frames():
 
 
 # route for video streaming
-@app.route('/live')
-def live():
+@app.route('/camera')
+def camera():
     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-# route for home page
-@app.route('/')
-def index():
+# route for live
+@app.route('/live')
+def live():
     if hasattr(app, 'camera_monitor'):
         camera_monitor = app.camera_monitor
         camera_id = camera_monitor.camera_id
@@ -68,5 +68,13 @@ def index():
         fps = 30
         start_time = datetime.now()
 
-    return render_template('index.html', camera_id=camera_id, frame_width=frame_width,
+    return render_template('live.html', camera_id=camera_id, frame_width=frame_width,
                            frame_height=frame_height, fps=fps, start_time=start_time)
+
+@app.route('/recordings')
+def recordings():
+    return render_template('recordings.html')
+
+@app.route('/')
+def index():
+    return redirect(url_for('live'))
