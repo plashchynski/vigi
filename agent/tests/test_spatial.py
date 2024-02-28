@@ -1,5 +1,5 @@
 import unittest
-from vigi_agent.spatial import boxes_intersect
+from vigi_agent.utils.spatial import boxes_intersect
 
 class SpatialTestCase(unittest.TestCase):
     def test_boxes_intersect(self):

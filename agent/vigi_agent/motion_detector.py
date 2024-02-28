@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 from ultralytics import YOLO
 
-from vigi_agent.spatial import boxes_intersect
+from vigi_agent.utils.spatial import boxes_intersect
 from vigi_agent.drawing import draw_bboxes, draw_bbox, draw_title
 
 class MotionDetector():
