@@ -19,6 +19,29 @@
         {% endblock %}
     </head>
     <body>
+        <nav class="navbar navbar-expand-sm bg-body-tertiary">
+            <div class="container d-flex flex-row justify-content-start">
+                <a class="navbar-brand mb-0 h1" href="/">
+                    <img src="{{ url_for('static', filename='logo.png') }}" width="24" height="24" class="d-inline-block align-top" alt="">
+                    ViGi
+                </a>
+
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == url_for('live') %}active{% endif %}" aria-current="page" href="{{ url_for('live') }}">
+                            <span class="bg-danger recording-dot"></span>
+                            Live
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == url_for('recordings') %}active{% endif %}" href="{{ url_for('recordings') }}">
+                            Recordings
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
         {% block content %}{% endblock %}
 
         {% block scripts %}
