@@ -6,7 +6,7 @@ live_blueprint = Blueprint('live', __name__)
 
 # route for live
 @live_blueprint.route('/live')
-def live():
+def index():
     if hasattr(current_app, 'camera_monitor'):
         camera_monitor = current_app.camera_monitor
         camera_id = camera_monitor.camera_id
@@ -22,5 +22,5 @@ def live():
         fps = 30
         start_time = datetime.now()
 
-    return render_template('live.html', camera_id=camera_id, frame_width=frame_width,
+    return render_template('live/index.html', camera_id=camera_id, frame_width=frame_width,
                            frame_height=frame_height, fps=fps, start_time=start_time)
