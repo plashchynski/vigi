@@ -4,4 +4,4 @@ recordings_blueprint = Blueprint('recordings', __name__)
 
 @recordings_blueprint.route('/recordings')
 def index():
-    return render_template('recordings.html')
+    return render_template('recordings/index.html')
