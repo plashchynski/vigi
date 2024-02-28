@@ -7,7 +7,7 @@ import cv2
 
 from .motion_detector import MotionDetector
 
-from .pub_sub import PubSub
+from .utils.pub_sub import PubSub
 
 
 class CameraMonitor(threading.Thread):
