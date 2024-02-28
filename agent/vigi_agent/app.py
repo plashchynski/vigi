@@ -4,6 +4,8 @@ import numpy as np
 from flask_bootstrap import Bootstrap5
 from flask import Flask, Response, render_template, redirect, url_for
 
+from .routes.live import live_blueprint
+
 # Initialize the Flask app
 app = Flask(__name__)
 
@@ -50,26 +52,7 @@ def generate_frames():
 def camera():
     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-# route for live
-@app.route('/live')
-def live():
-    if hasattr(app, 'camera_monitor'):
-        camera_monitor = app.camera_monitor
-        camera_id = camera_monitor.camera_id
-        frame_width = camera_monitor.frame_width
-        frame_height = camera_monitor.frame_height
-        fps = camera_monitor.fps
-        start_time = camera_monitor.start_time
-    else:
-        # dummy values for the development environment
-        camera_id = 0
-        frame_width = 640
-        frame_height = 480
-        fps = 30
-        start_time = datetime.now()
-
-    return render_template('live.html', camera_id=camera_id, frame_width=frame_width,
-                           frame_height=frame_height, fps=fps, start_time=start_time)
+app.register_blueprint(live_blueprint)
 
 @app.route('/recordings')
 def recordings():
@@ -77,4 +60,4 @@ def recordings():
 
 @app.route('/')
 def index():
-    return redirect(url_for('live'))
+    return redirect(url_for('live.live'))
