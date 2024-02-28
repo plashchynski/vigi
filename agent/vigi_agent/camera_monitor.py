@@ -1,5 +1,5 @@
-import sys
 import threading
+from datetime import datetime
 import time
 import logging
 
@@ -30,6 +30,9 @@ class CameraMonitor(threading.Thread):
 
         # video_recorder is used to save the video to a file when motion is detected
         self.video_recorder = video_recorder
+
+        # save the start time of the camera monitor to calculate the uptime
+        self.start_time = datetime.now()
 
     def motion_callback(self):
         logging.info("Motion detected!")

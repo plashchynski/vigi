@@ -1,6 +1,22 @@
 {% extends "base.html" %}
+
 {% block title %}Live View{% endblock %}
 {% block content %}
-  <h1>Cam #1</h1>
-  <img class="cam_live_view" src="{{ url_for('video_stream') }}">
+
+<nav class="navbar bg-body-tertiary">
+  <div class="container">
+    <span class="navbar-brand mb-0 h1">ViGi</span>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="card" style="width: 25rem;">
+    <img class="card-img-top" alt="camera stream" src="{{ url_for('live') }}">
+    <div class="card-body">
+      <h5 class="card-title">Camera #{{ camera_id }}</h5>
+      <h6 class="card-subtitle mb-2 text-muted">{{ frame_width }}x{{ frame_height }}@{{ fps }} FPS</h6>
+      <p class="card-text">Online since {{ start_time.strftime("%Y-%m-%d %H:%M:%S") }}</p>
+    </div>
+  </div>
+</div>
 {% endblock %}
