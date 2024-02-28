@@ -3,11 +3,16 @@
 {% block title %}Live View{% endblock %}
 {% block content %}
 
+
 <nav class="navbar bg-body-tertiary">
   <div class="container">
-    <span class="navbar-brand mb-0 h1">ViGi</span>
+    <a class="navbar-brand mb-0 h1" href="/">
+      <img src="{{ url_for('static', filename='logo.png') }}" width="24" height="24" class="d-inline-block align-top" alt="">
+      ViGi
+    </a>
   </div>
 </nav>
+
 
 <div class="container">
   <div class="card" style="width: 25rem;">
