@@ -4,7 +4,7 @@
 {% block content %}
 <div class="container">
   <div class="card" style="width: 25rem;">
-    <img class="card-img-top" alt="camera stream" src="{{ url_for('camera') }}">
+    <img class="card-img-top" alt="camera stream" src="{{ url_for('camera.camera') }}">
     <div class="card-body">
       <h5 class="card-title">Camera #{{ camera_id }}</h5>
       <h6 class="card-subtitle mb-2 text-muted">{{ frame_width }}x{{ frame_height }}@{{ fps }} FPS</h6>
