@@ -24,7 +24,13 @@
                         <div class="d-flex align-content-start flex-wrap">
                             {% for recording in recordings[recording_date] %}
                                 <div class="card m-2" style="width: 18rem;">
-                                    <img src="{{ url_for('recordings.preview', date = recording_date, time = recording["time"]) }}" class="card-img-top" alt="...">
+                                    <img src="{{ url_for('recordings.preview', date = recording_date, time = recording["time"]) }}" class="card-img-top">
+                                    <div class="card-body">
+                                        <p class="card-text">
+                                            {{ format_time(recording["time"]) }}
+                                            {{ format_duration(recording["duration"]) }}
+                                        </p>
+                                    </div>
                                 </div>
                             {% endfor %}
                         </div>

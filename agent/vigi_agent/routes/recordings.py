@@ -3,7 +3,7 @@ import glob
 from pathlib import Path
 
 from flask import Blueprint, redirect, url_for, render_template, current_app
-from vigi_agent.utils.media import generate_preview
+from vigi_agent.utils.media import generate_preview, read_video_file_meta
 
 from vigi_agent.cache import cache
 
@@ -45,12 +45,17 @@ def index():
         directory = recording_date
         files = glob.glob(os.path.join(recording_path, directory, '*.mp4'))
 
-        # basename the files
-        recordings[directory] = [
-            {
-                "time": Path(file).stem
-            }
-            for file in files
-        ]
+        for file in files:
+            meta_data = read_video_file_meta(file)
+            if not meta_data:
+                meta_data = {}
+
+            # initialize the recordings dictionary
+            recordings[recording_date] = recordings.get(recording_date, [])
+
+            recordings[recording_date].append({
+                "time": Path(file).stem,
+                "duration": meta_data.get("duration"),
+            })
 
     return render_template('recordings/index.html', recording_dates=recording_dates, recordings=recordings)

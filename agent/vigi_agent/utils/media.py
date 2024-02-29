@@ -35,6 +35,7 @@ def generate_preview(video_path):
     if not cap.isOpened():
         return None
     
+    # get the total number of frames in the video
     frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
     # select random frame to start preview
@@ -42,12 +43,15 @@ def generate_preview(video_path):
 
     # select the frame for the preview
     cap.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
+
+    # read the frame
     ret, frame = cap.read()
     if not ret:
         return None
     
     cap.release()
 
-    # convert the frame to JPEG
+    # convert the frame to JPEG and return it
     _, frame = cv2.imencode('.jpg', frame)
+
     return frame.tobytes()
