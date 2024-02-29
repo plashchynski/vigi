@@ -1,5 +1,5 @@
 import unittest
-from vigi_agent.utils.media import read_video_file_meta
+from vigi_agent.utils.media import read_video_file_meta, generate_preview
 
 class MediaTestCase(unittest.TestCase):
     def test_read_video_file_meta(self):
@@ -10,3 +10,8 @@ class MediaTestCase(unittest.TestCase):
         self.assertEqual(meta["fps"], 30.0)
         self.assertEqual(meta["frame_count"], 331)
         self.assertEqual(meta["duration"], 11.0)
+
+    def test_generate_preview(self):
+        # preview should return the first frame of a video file
+        frame = generate_preview("tests/samples/positive/sample2.mov")
+        self.assertIsNotNone(frame)

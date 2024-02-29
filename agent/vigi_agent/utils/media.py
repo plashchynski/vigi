@@ -1,6 +1,7 @@
 # This module contains utility functions for working with media files.
 
 import cv2
+import random
 
 def read_video_file_meta(video_path):
     """
@@ -25,3 +26,28 @@ def read_video_file_meta(video_path):
         "frame_count": frame_count,
         "duration": duration
     }
+
+def generate_preview(video_path):
+    """
+    Open video file, select a random frame and return it as a JPEG image for preview.
+    """
+    cap = cv2.VideoCapture(video_path)
+    if not cap.isOpened():
+        return None
+    
+    frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+
+    # select random frame to start preview
+    frame_number = int(frame_count * random.random())
+
+    # select the frame for the preview
+    cap.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
+    ret, frame = cap.read()
+    if not ret:
+        return None
+    
+    cap.release()
+
+    # convert the frame to JPEG
+    _, frame = cv2.imencode('.jpg', frame)
+    return frame.tobytes()
