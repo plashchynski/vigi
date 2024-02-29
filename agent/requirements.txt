@@ -3,3 +3,4 @@ flask==3.0.2
 bootstrap-flask==2.3.3
 ultralytics==8.1.14
 flask-caching==2.1.0
+humanize==4.9.0
