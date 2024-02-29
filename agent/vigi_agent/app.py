@@ -17,4 +17,4 @@ app.register_blueprint(recordings_blueprint)
 
 @app.route('/')
 def index():
-    return redirect(url_for('live.live'))
+    return redirect(url_for('live.index'))

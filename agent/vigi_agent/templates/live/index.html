@@ -3,12 +3,15 @@
 {% block title %}Live View{% endblock %}
 {% block content %}
 <div class="container">
-  <div class="card" style="width: 25rem;">
-    <img class="card-img-top" alt="camera stream" src="{{ url_for('camera.camera') }}">
-    <div class="card-body">
-      <h5 class="card-title">Camera #{{ camera_id }}</h5>
-      <h6 class="card-subtitle mb-2 text-muted">{{ frame_width }}x{{ frame_height }}@{{ fps }} FPS</h6>
-      <p class="card-text">Online since {{ start_time.strftime("%Y-%m-%d %H:%M:%S") }}</p>
+  <h1>Live View</h1>
+  <div class="row">  
+    <div class="card" style="width: 25rem;">
+      <img class="card-img-top" alt="camera stream" src="{{ url_for('camera.camera') }}">
+      <div class="card-body">
+        <h5 class="card-title">Camera #{{ camera_id }}</h5>
+        <h6 class="card-subtitle mb-2 text-muted">{{ frame_width }}x{{ frame_height }}@{{ fps }} FPS</h6>
+        <p class="card-text">Online since {{ start_time.strftime("%Y-%m-%d %H:%M:%S") }}</p>
+      </div>
     </div>
   </div>
 </div>
