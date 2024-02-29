@@ -1,6 +1,7 @@
 import os
 import time
 import logging
+import random
 
 import cv2
 
@@ -15,6 +16,8 @@ class VideoRecorder():
     def __init__(self, recording_path: str = "./recordings/"):
         self.recording = False
         self.recording_path = recording_path
+        self.preview_saved = False
+        self.time_str = None
 
     def start_recording(self, frame_width = None, frame_height = None, fps = None) -> None:
         """
@@ -35,6 +38,7 @@ class VideoRecorder():
             return
 
         self.recording = True
+        self.preview_saved = False
 
         # ensure that the recording path exists
         # if not, create the directory
@@ -45,14 +49,14 @@ class VideoRecorder():
         # The recordings for each day will be saved in a separate directory
         # Ensure that the date path exists
         # if not, create the directory
-        date_path = os.path.join(self.recording_path, time.strftime("%Y-%m-%d"))
-        if not os.path.exists(date_path):
-            logging.info(f"Creating directory: {date_path}")
-            os.makedirs(date_path)
+        self.date_path = os.path.join(self.recording_path, time.strftime("%Y-%m-%d"))
+        if not os.path.exists(self.date_path):
+            logging.info(f"Creating directory: {self.date_path}")
+            os.makedirs(self.date_path)
 
-        time_str = time.strftime("%H-%M-%S")
-        file_name = f"motion_detected_{time_str}.mp4"
-        recording_full_path = os.path.join(date_path, file_name)
+        self.time_str = time.strftime("%H-%M-%S")
+        file_name = f"motion_detected_{self.time_str}.mp4"
+        recording_full_path = os.path.join(self.date_path, file_name)
         logging.info(f"Recording video to: {recording_full_path}")
 
         fourcc = cv2.VideoWriter_fourcc(*'mp4v') # For MP4 format
@@ -81,4 +85,14 @@ class VideoRecorder():
         if self.recording:
             # Add the frame to the video file
             self.video_writer.write(frame)
+
+            # save the first frame as a preview
+            if not self.preview_saved:
+                # Save the first frame as a preview
+                preview_file_name = f"motion_detected_{self.time_str}.jpg"
+                preview_path = os.path.join(self.date_path, preview_file_name)
+
+                cv2.imwrite(preview_path, frame)
+                self.preview_saved = True
+
             return
