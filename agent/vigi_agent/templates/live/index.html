@@ -5,12 +5,29 @@
 <div class="container">
   <h1>Live View</h1>
 
-  <div class="card" style="width: 20rem;">
-    <img class="card-img-top" alt="camera stream" src="{{ url_for('camera.camera') }}">
-    <div class="card-body">
-      <h5 class="card-title">Camera #{{ camera_id }}</h5>
-      <h6 class="card-subtitle mb-2 text-muted">{{ frame_width }}x{{ frame_height }}@{{ fps }} FPS</h6>
-      <p class="card-text">Online since {{ start_time.strftime("%Y-%m-%d %H:%M:%S") }}</p>
+  <a data-bs-toggle="modal" data-bs-target="#live_video_modal">
+    <div class="card live_video_card" style="width: 20rem;">
+      <img class="card-img-top" alt="camera stream" src="{{ url_for('camera.camera') }}">
+      <div class="card-body">
+        <h5 class="card-title">Camera #{{ camera_id }}</h5>
+        <h6 class="card-subtitle mb-2 text-muted">{{ frame_width }}x{{ frame_height }}@{{ fps }} FPS</h6>
+        <p class="card-text">Online since {{ start_time.strftime("%Y-%m-%d %H:%M:%S") }}</p>
+      </div>
+    </div>
+  </a>
+</div>
+
+<!-- Modal to show the live video -->
+<div class="modal fade" id="live_video_modal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="modalTitle">Live video</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <img class="card-img-top" alt="camera stream" src="{{ url_for('camera.camera') }}">
+      </div>
     </div>
   </div>
 </div>

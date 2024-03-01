@@ -15,7 +15,7 @@
     top: -1px;
 }
 
-.recording_card {
+.recording_card,.live_video_card {
     cursor: pointer;
 }
 
