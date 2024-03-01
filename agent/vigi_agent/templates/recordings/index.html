@@ -3,62 +3,62 @@
 {% block title %}Recordings{% endblock %}
 {% block content %}
 <div class="container">
-    <h1>Recordings</h1>
+  <h1>Recordings</h1>
 
-    {% if recording_dates | length == 0 %}
-        <div class="alert alert-warning" role="alert">
-            No recordings so far. The recordings will be displayed here once the camera detects any motion.
-        </div>
-    {% endif %}
-
-    <div class="accordion" id="accordion_recording_dates">
-        {% for recording_date in recording_dates %}
-            <div class="accordion-item">
-                <h2 class="accordion-header">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ recording_date }}" aria-expanded="true" aria-controls="collapseOne">
-                    {{ recording_date }}
-                    </button>
-                </h2>
-                <div id="collapse{{ recording_date }}" class="accordion-collapse collapse recording_date_section" data-bs-parent="#accordion_recording_dates" data-date="{{ recording_date }}">
-                    <div class="accordion-body">
-                        <div class="d-flex align-content-start flex-wrap">
-                            {% for recording in recordings[recording_date] %}
-                                <a data-bs-toggle="modal" data-bs-target="#recording_video_modal">
-                                    <div class="recording_card card m-2" style="width: 18rem;" data-time="{{ recording["time"] }}">
-                                        <img src="{{ url_for('recordings.preview', date = recording_date, time = recording["time"]) }}" class="card-img-top">
-                                        <div class="card-body">
-                                            <p class="card-text">
-                                                {{ format_time(recording["time"]) }}
-                                                {{ format_duration(recording["duration"]) }}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </a>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        {% endfor %}
+  {% if recording_dates | length == 0 %}
+    <div class="alert alert-warning" role="alert">
+      No recordings so far. The recordings will be displayed here once the camera detects any motion.
     </div>
+  {% endif %}
+
+  <div class="accordion" id="accordion_recording_dates">
+    {% for recording_date in recording_dates %}
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ recording_date }}" aria-expanded="true" aria-controls="collapseOne">
+            {{ recording_date }}
+          </button>
+        </h2>
+        <div id="collapse{{ recording_date }}" class="accordion-collapse collapse recording_date_section" data-bs-parent="#accordion_recording_dates" data-date="{{ recording_date }}">
+          <div class="accordion-body">
+            <div class="d-flex align-content-start flex-wrap">
+              {% for recording in recordings[recording_date] %}
+                <a data-bs-toggle="modal" data-bs-target="#recording_video_modal">
+                  <div class="recording_card card m-2" style="width: 18rem;" data-time="{{ recording["time"] }}">
+                    <img src="{{ url_for('recordings.preview', date = recording_date, time = recording["time"]) }}" class="card-img-top">
+                    <div class="card-body">
+                      <p class="card-text">
+                        {{ format_time(recording["time"]) }}
+                        {{ format_duration(recording["duration"]) }}
+                      </p>
+                    </div>
+                  </div>
+                </a>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
 </div>
 
-<!-- Modal -->
-<div class="modal fade" id="recording_video_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-            <video controls>
-                <source id="video_source" src="" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
-        </div>
+<!-- Modal to show the video recording -->
+<div class="modal fade" id="recording_video_modal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="modalTitle">Video title</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <video controls>
+          <source id="video_source" src="" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
       </div>
     </div>
   </div>
+</div>
 
 {% endblock %}
