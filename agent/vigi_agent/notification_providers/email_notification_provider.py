@@ -22,6 +22,7 @@ class EmailNotificationProvider:
         self.smtp_password = smtp_password
         self.sender_email = sender_email
         self.recipient_emails = recipient_emails
+        logging.info(f"EmailNotificationProvider initialized with sender_email: {sender_email}, recipient_emails: {recipient_emails}")
 
     def notify(self, notification_text: str):
         """

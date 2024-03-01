@@ -15,6 +15,7 @@ class SMSNotificationProvider:
         self.from_number = from_number
         self.recipient_phone_numbers = recipient_phone_numbers
         self.client = Client(account_sid, auth_token)
+        logging.info("SMS notification provider initialized successfully.")
 
     def notify(self, notification_text):
         """
