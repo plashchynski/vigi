@@ -12,7 +12,7 @@ def index():
         camera_id = camera_monitor.camera_id
         frame_width = camera_monitor.frame_width
         frame_height = camera_monitor.frame_height
-        fps = camera_monitor.fps
+        fps = camera_monitor.current_fps()
         start_time = camera_monitor.start_time
     else:
         # dummy values for the development environment
