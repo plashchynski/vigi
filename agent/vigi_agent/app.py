@@ -1,8 +1,9 @@
+# This is the entry point for the Flask application.
+
 from flask_bootstrap import Bootstrap5
 from flask import Flask, redirect, url_for
 
 from .cache import cache
-
 from .context_processors import utility_processor
 
 from .routes.live import live_blueprint

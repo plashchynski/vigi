@@ -30,7 +30,7 @@ python main.py
 If you want to run the Flask app in debug mode without the camera monitor, you can do so by running the following command:
 
 ```bash
-.venv/bin/flask --debug --app vigi_agent.app run
+python main.py --debug --no-monitor
 ```
 
 ## Run unit tests
