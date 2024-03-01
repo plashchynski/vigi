@@ -11,7 +11,7 @@ from .routes.camera import camera_blueprint
 from .routes.recordings import recordings_blueprint
 
 # Initialize the Flask app
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='')
 
 # setup the cache
 cache.init_app(app)
