@@ -19,19 +19,21 @@
                     {{ recording_date }}
                     </button>
                 </h2>
-                <div id="collapse{{ recording_date }}" class="accordion-collapse collapse" data-bs-parent="#accordion_recording_dates">
+                <div id="collapse{{ recording_date }}" class="accordion-collapse collapse recording_date_section" data-bs-parent="#accordion_recording_dates" data-date="{{ recording_date }}">
                     <div class="accordion-body">
                         <div class="d-flex align-content-start flex-wrap">
                             {% for recording in recordings[recording_date] %}
-                                <div class="card m-2" style="width: 18rem;">
-                                    <img src="{{ url_for('recordings.preview', date = recording_date, time = recording["time"]) }}" class="card-img-top">
-                                    <div class="card-body">
-                                        <p class="card-text">
-                                            {{ format_time(recording["time"]) }}
-                                            {{ format_duration(recording["duration"]) }}
-                                        </p>
+                                <a data-bs-toggle="modal" data-bs-target="#recording_video_modal">
+                                    <div class="recording_card card m-2" style="width: 18rem;" data-time="{{ recording["time"] }}">
+                                        <img src="{{ url_for('recordings.preview', date = recording_date, time = recording["time"]) }}" class="card-img-top">
+                                        <div class="card-body">
+                                            <p class="card-text">
+                                                {{ format_time(recording["time"]) }}
+                                                {{ format_duration(recording["duration"]) }}
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
+                                </a>
                             {% endfor %}
                         </div>
                     </div>
@@ -40,5 +42,23 @@
         {% endfor %}
     </div>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="recording_video_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <video controls>
+                <source id="video_source" src="" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+      </div>
+    </div>
+  </div>
 
 {% endblock %}

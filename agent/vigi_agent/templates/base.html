@@ -47,5 +47,7 @@
         {% block scripts %}
             {{ bootstrap.load_js() }}
         {% endblock %}
+
+        <script src="{{url_for('static', filename='main.js')}}"></script>
     </body>
 </html>

@@ -2,7 +2,7 @@ import os
 import glob
 from pathlib import Path
 
-from flask import Blueprint, redirect, url_for, render_template, current_app
+from flask import Blueprint, redirect, url_for, render_template, current_app, send_file
 from vigi_agent.utils.media import generate_preview, read_video_file_meta
 
 from vigi_agent.cache import cache
@@ -12,8 +12,9 @@ recordings_blueprint = Blueprint('recordings', __name__)
 @recordings_blueprint.route('/recordings/<date>/<time>/preview')
 @cache.cached(timeout=600) # Cache the preview for 10 minutes as it's a unlikely to change
 def preview(date, time):
-    recording_path = "recordings/"
-    video_path = os.path.join(recording_path, date, f"{time}.mp4")
+    video_path = video_file_path(date, time)
+
+    # TODO: Check if video_path exists
     jpg = generate_preview(video_path)
 
     if jpg is None:
@@ -21,10 +22,20 @@ def preview(date, time):
 
     return jpg, 200, {'Content-Type': 'image/jpeg'}
 
+@recordings_blueprint.route('/recordings/<date>/<time>/video')
+def video(date, time):
+    video_path = video_file_path(date, time)
+
+    if not os.path.exists(video_path):
+        return "Video not found", 404
+
+    return send_file(video_path)
+
+
 @recordings_blueprint.route('/recordings')
 def index():
     # recording_path = current_app.user_config['RecordingsPath']
-    recording_path = "recordings/"
+    recording_path = current_app.user_config['RecordingsPath']
 
     # check if recording_path exists
     if not os.path.exists(recording_path):
@@ -59,3 +70,7 @@ def index():
             })
 
     return render_template('recordings/index.html', recording_dates=recording_dates, recordings=recordings)
+
+def video_file_path(date, time):
+    recording_path = current_app.user_config['RecordingsPath']
+    return os.path.abspath(os.path.join(recording_path, date, f"{time}.mp4"))

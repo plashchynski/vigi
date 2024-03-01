@@ -14,3 +14,7 @@
     position: relative;
     top: -1px;
 }
+
+.recording_card {
+    cursor: pointer;
+}
