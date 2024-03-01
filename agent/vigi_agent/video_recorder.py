@@ -23,6 +23,9 @@ class VideoRecorder():
         as they can be changed between recording sessions.
         """
 
+        logging.info("Starting video recording...")
+        logging.info(f"Using parameters: Frame width: {frame_width}, frame height: {frame_height}, FPS: {fps}")
+
         if frame_width is None or frame_height is None:
             logging.error(f"Frame width and height were not provided. Set to default values of {DEFAULT_FRAME_WIDTH}x{DEFAULT_FRAME_HEIGHT}")
             frame_width = DEFAULT_FRAME_WIDTH

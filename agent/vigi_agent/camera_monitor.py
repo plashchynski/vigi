@@ -7,6 +7,7 @@ import cv2
 
 from .motion_detector import MotionDetector
 
+from vigi_agent.utils.fps_calculator import FPSCalculator
 from .utils.pub_sub import PubSub
 
 
@@ -34,9 +35,22 @@ class CameraMonitor(threading.Thread):
         # save the start time of the camera monitor to calculate the uptime
         self.start_time = datetime.now()
 
+        self.fps_calculator = FPSCalculator(max_history_size=50)
+
     def motion_callback(self):
         logging.info("Motion detected!")
-        self.video_recorder.start_recording(frame_width=self.frame_width, frame_height=self.frame_height, fps=self.fps)
+
+        # We need to determine the FPS of the camera to pass it to the video recorder
+        # as FPS will be saved as metadata in the video file
+        # if FPS will be overestimated, the video will be played faster than it should be
+        # if FPS will be underestimated, the video will be played slower than it should be
+        fps = self.fps_calculator.current_fps()
+        logging.info(f"Calculated FPS = {fps}")
+        if fps is None:
+            logging.warning(f"FPS is not calculated yet, using the camera's FPS = {self.fps}")
+            fps = self.fps # use the camera's FPS if the FPS calculator hasn't calculated the FPS yet
+
+        self.video_recorder.start_recording(frame_width=self.frame_width, frame_height=self.frame_height, fps=fps)
 
     def run(self):
         # Initialize the camera with OpenCV
@@ -91,6 +105,7 @@ class CameraMonitor(threading.Thread):
             # it should record the frame or not. It could decide to record additional frames before and after
             # the motion is detected
             self.video_recorder.add_frame(frame)
+            self.fps_calculator.update()
 
         # OpenCV cleanup
         camera.release()
