@@ -18,3 +18,9 @@
 .recording_card {
     cursor: pointer;
 }
+
+.modal-body {
+    video {
+        width: 100%;
+    }
+}
