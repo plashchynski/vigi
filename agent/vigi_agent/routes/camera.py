@@ -22,7 +22,11 @@ def generate_frames(camera_monitor):
                 frame = stream.get()
             else:
                 # generate a black frame for the development environment
-                frame = np.zeros((480, 640, 3), dtype=np.uint8)
+                frame = np.zeros((360, 640, 3), dtype=np.uint8)
+
+                # Add no signal text
+                font = cv2.FONT_HERSHEY_SIMPLEX
+                cv2.putText(frame, 'No signal', (50, 100), font, 2, (255, 255, 255), 2, cv2.LINE_AA)
 
             # Convert the frame to JPEG
             _ret, jpeg = cv2.imencode('.jpg', frame)
