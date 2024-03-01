@@ -16,7 +16,7 @@ class CameraMonitor(threading.Thread):
     A class that monitors the camera for motion and publishes the video stream from the camera.
     """
 
-    def __init__(self, video_recorder = None, camera_id=0, max_errors=50, add_seconds_after_motion=3):
+    def __init__(self, video_recorder = None, camera_id=0, max_errors=50, add_seconds_after_motion=5):
         """
         max_errors: int - the maximum number of consecutive errors when reading a frame from the camera
                             before the camera monitor stops. It's used to prevent the camera monitor from

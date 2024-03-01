@@ -69,6 +69,9 @@ def index():
                 "duration": meta_data.get("duration"),
             })
 
+            # sort recordings by time
+            recordings[recording_date].sort(key=lambda x: x["time"], reverse=True)
+
     return render_template('recordings/index.html', recording_dates=recording_dates, recordings=recordings)
 
 def video_file_path(date, time):
