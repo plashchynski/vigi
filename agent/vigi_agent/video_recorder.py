@@ -57,11 +57,13 @@ class VideoRecorder():
         recording_full_path = os.path.join(date_path, file_name)
         logging.info(f"Recording video to: {recording_full_path}")
 
-        fourcc = cv2.VideoWriter_fourcc(*'mp4v') # For MP4 format
+        # fourcc = cv2.VideoWriter_fourcc(*'mp4v') # MPEG-4 Part 2 (Simple Profile) codec, doesn't work in Chrome
+        # fourcc = cv2.VideoWriter_fourcc(*'X264') # H.264 codec is not available on Apple M1
+        fourcc = cv2.VideoWriter_fourcc(*'avc1')
         self.video_writer = cv2.VideoWriter(
             filename = recording_full_path,
             fourcc = fourcc,
-            fps = fps,
+            fps = int(fps),
             frameSize = (int(frame_width), int(frame_height)),
         )
 
