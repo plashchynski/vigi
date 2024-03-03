@@ -5,6 +5,7 @@
 import argparse
 import logging
 import configparser
+import atexit
 
 from vigi_agent.agent_config import AgentConfig
 
@@ -132,5 +133,20 @@ else:
     app.camera_monitor = camera_monitor
     logging.info("Camera monitor started successfully.")
 
+def graceful_exit():
+    logging.info("Exiting the application... ")
+    if hasattr(app, 'camera_monitor'):
+        app.camera_monitor.stop()
+    logging.info("Application exited successfully.")
+
+atexit.register(graceful_exit)
+
 logging.info("Starting the Flask web server... ")
-app.run(host=app.agent_config.host, port=app.agent_config.port, debug=app.agent_config.debug)
+flask_debug = False
+if app.agent_config.debug and app.agent_config.no_monitor:
+    # enable debug mode if the monitor is disabled, because
+    # it cause race conditions in multithreading
+    flask_debug = True
+    logging.warning("Flask debug mode is enabled.")
+
+app.run(host=app.agent_config.host, port=app.agent_config.port, debug=flask_debug)

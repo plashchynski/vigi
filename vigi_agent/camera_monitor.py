@@ -51,6 +51,9 @@ class CameraMonitor(threading.Thread):
         # and decremented in each frame until it reaches 0
         self.add_frames = 0
 
+        # A flag to stop the camera monitor
+        self.should_stop = False
+
     def current_fps(self):
         """
         Returns the current FPS of the system using the FPS calculator if it has calculated the FPS,
@@ -59,8 +62,8 @@ class CameraMonitor(threading.Thread):
         fps = self.fps_calculator.current_fps()
         logging.info(f"Calculated FPS = {fps}")
         if fps is None:
-            logging.warning(f"FPS is not calculated yet, using the camera's FPS = {self.fps}")
             fps = int(self.camera_fps)
+            logging.warning(f"FPS is not calculated yet, using the camera's FPS = {fps}")
 
         # TODO: Set default FPS to 30 if the FPS from the camera is 1 or otherwize invalid
 
@@ -96,52 +99,68 @@ class CameraMonitor(threading.Thread):
             logging.error(f"Camera with ID={self.camera_id} could not be opened.")
             return
 
-        self.frame_width = camera.get(cv2.CAP_PROP_FRAME_WIDTH)
-        self.frame_height = camera.get(cv2.CAP_PROP_FRAME_HEIGHT)
-        self.camera_fps = camera.get(cv2.CAP_PROP_FPS)
-        logging.info(f"Camera parameters: frame width: {self.frame_width}, frame height: {self.frame_height}, FPS: {self.camera_fps}")
+        try:
+            self.frame_width = camera.get(cv2.CAP_PROP_FRAME_WIDTH)
+            self.frame_height = camera.get(cv2.CAP_PROP_FRAME_HEIGHT)
+            self.camera_fps = camera.get(cv2.CAP_PROP_FPS)
+            logging.info(f"Camera parameters: frame width: {self.frame_width}, frame height: {self.frame_height}, FPS: {self.camera_fps}")
 
-        error_count = 0
-        while True:
-            success, frame = camera.read()  # Read a frame from the camera
-            if not success:
-                # If the camera fails to read a frame:
-                # - Increment the error count
-                # - Print an error message
-                # - Sleep for 1 second
-                #
-                # If the error count reaches the maximum number of consecutive errors:
-                # - print an error message and break the loop
-
-                error_count += 1
-                if error_count >= self.max_errors:
-                    logging.fatal(f"Maximum number of consecutive errors ({self.max_errors}) reached. Exiting.")
-                    break
-
-                logging.error(f"Failed to read a frame from the camera with ID={self.camera_id}")
-                time.sleep(1)
-                continue
-
-            # Reset the error count if a frame is successfully read
             error_count = 0
+            while not self.should_stop:
+                success, frame = camera.read()  # Read a frame from the camera
+                if not success:
+                    # If the camera fails to read a frame:
+                    # - Increment the error count
+                    # - Print an error message
+                    # - Sleep for 1 second
+                    #
+                    # If the error count reaches the maximum number of consecutive errors:
+                    # - print an error message and break the loop
 
-            # Apply the motion detector to the frame
-            frame = self.motion_detector.update(frame)
+                    error_count += 1
+                    if error_count >= self.max_errors:
+                        logging.fatal(f"Maximum number of consecutive errors ({self.max_errors}) reached. Exiting.")
+                        break
 
-            # Publish the frame to the frame stream
-            self.frame_stream.publish(frame)
+                    logging.error(f"Failed to read a frame from the camera with ID={self.camera_id}")
+                    time.sleep(1)
+                    continue
 
-            # if motion is not detected anymore and the video is being recorded, then stop the recording
-            if not self.motion_detector.is_motion_detected() and self.video_recorder.is_recording():
-                self.add_frames -= 1
-                if self.add_frames <= 0:
-                    self.video_recorder.еnd_recording()
+                # Reset the error count if a frame is successfully read
+                error_count = 0
 
-            # here we send all frames to the video recorder, it's up to the video recorder to decide if
-            # it should record the frame or not. It could decide to record additional frames before and after
-            # the motion is detected
-            self.video_recorder.add_frame(frame)
-            self.fps_calculator.update()
+                # Apply the motion detector to the frame
+                frame = self.motion_detector.update(frame)
 
-        # OpenCV cleanup
-        camera.release()
+                # Publish the frame to the frame stream
+                self.frame_stream.publish(frame)
+
+                # if motion is not detected anymore and the video is being recorded, then stop the recording
+                if not self.motion_detector.is_motion_detected() and self.video_recorder.is_recording():
+                    self.add_frames -= 1
+                    if self.add_frames <= 0:
+                        self.video_recorder.еnd_recording()
+
+                # here we send all frames to the video recorder, it's up to the video recorder to decide if
+                # it should record the frame or not. It could decide to record additional frames before and after
+                # the motion is detected
+                self.video_recorder.add_frame(frame)
+                self.fps_calculator.update()
+
+        finally:
+            if self.video_recorder.is_recording():
+                self.video_recorder.еnd_recording()
+
+            # OpenCV cleanup
+            logging.info("Releasing the camera...")
+            camera.release()
+
+    def stop(self):
+        """
+        Gracefully shutdown the camera monitor.
+        """
+        logging.info("Shutting down the camera monitor...")
+        self.should_stop = True
+
+        # wait for the camera monitor to stop
+        self.join()
