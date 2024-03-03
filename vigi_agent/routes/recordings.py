@@ -34,8 +34,7 @@ def video(date, time):
 
 @recordings_blueprint.route('/recordings')
 def index():
-    # recording_path = current_app.user_config['RecordingsPath']
-    recording_path = current_app.user_config['RecordingsPath']
+    recording_path = current_app.agent_config.data_dir
 
     # check if recording_path exists
     if not os.path.exists(recording_path):
@@ -75,5 +74,5 @@ def index():
     return render_template('recordings/index.html', recording_dates=recording_dates, recordings=recordings)
 
 def video_file_path(date, time):
-    recording_path = current_app.user_config['RecordingsPath']
+    recording_path = current_app.agent_config.data_dir
     return os.path.abspath(os.path.join(recording_path, date, f"{time}.mp4"))
