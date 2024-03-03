@@ -24,6 +24,30 @@ wget https://github.com/ultralytics/assets/releases/download/v8.1.0/yolov8n.pt
 python main.py
 ```
 
+## Configuration
+
+The agent can be configured in two ways:
+* Using the `vigi.ini` file. This method is recommended for production use and when configuration is
+constant and does not change frequently.
+* Using command line arguments. This method is recommended for development and testing purposes:
+
+```bash
+usage: main.py [-h] [--debug] [--no-monitor] [--data-dir DATA_DIR] [--camera-id CAMERA_ID] [--host HOST] [--port PORT]
+               [--max-errors MAX_ERRORS]
+
+options:
+  -h, --help            show this help message and exit
+  --debug               Enable debug mode
+  --no-monitor          Disable the camera monitor
+  --data-dir DATA_DIR   Directory to store the recordings
+  --camera-id CAMERA_ID
+                        Camera ID to monitor
+  --host HOST           Host to run the web server
+  --port PORT           Port to run the web server
+  --max-errors MAX_ERRORS
+                        Maximum number of consecutive errors when reading a frame from the camera
+```
+
 ## Debugging Flask app
 
 If you want to run the Flask app in debug mode without the camera monitor, you can do so by running the following command:

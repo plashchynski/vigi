@@ -1,3 +1,7 @@
+# This file is the entry point of the application. It reads the configuration file
+# and the command line arguments, initializes the logger, the notifier, the video recorder
+# and the camera monitor, and starts the Flask web server.
+
 import argparse
 import logging
 import configparser
