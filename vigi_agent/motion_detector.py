@@ -93,7 +93,7 @@ class MotionDetector():
             cv2.putText(original_frame, 'MOTION DETECTED', (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
         if self.motion_detected:
-            results = self.yolo(original_frame)
+            results = self.yolo(original_frame, verbose=False)
 
             for result in results:
                 for box, cls in zip(result.boxes.xyxy, result.boxes.cls):
