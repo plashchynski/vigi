@@ -5,3 +5,4 @@ ultralytics==8.1.14
 flask-caching==2.1.0
 humanize==4.9.0
 twilio==9.0.0
+pywebpush==1.14.1

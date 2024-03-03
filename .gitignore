@@ -163,7 +163,7 @@ cython_debug/
 .DS_Store
 
 # Ignore YOLOv8 weights
-agent/yolov8n.pt
+yolov8n.pt
 
 # test samples are excluded from the repository and availabe to download separately
-agent/tests/samples/
+tests/samples/

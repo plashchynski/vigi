@@ -11,7 +11,6 @@
 
 ```bash
 # Set up a virtual environment
-cd agent
 python3.12 -m venv .venv
 . .venv/bin/activate
 
@@ -40,6 +39,5 @@ Download a samples dataset for the motion detection tests from [here](https://dr
 Then run the tests:
 
 ```bash
-cd agent
 python -m unittest tests/**/*.py
 ```
