@@ -13,18 +13,19 @@ if (recordingVideoModal) {
         // find child element with class 'recording_video'
         const recordingVideo = button.querySelector('.recording_card');
 
-        // get data from the child element
+        // get data and camera_id from the child element
         const time = recordingVideo.dataset.time;
+        const camera_id = recordingVideo.dataset.cameraId;
 
         // Update the modal's title
         const modalTitle = recordingVideoModal.querySelector('.modal-title')
-        modalTitle.textContent = `Recording for ${date} at ${time}`;
+        modalTitle.textContent = `Recording for ${date} at ${time} from camera #${camera_id}`;
 
         // find #video_source element among children of recording_video_modal
         const videoSource = recordingVideoModal.querySelector('#video_source');
 
         // update src attribute of the video source
-        videoSource.src = `/recordings/${date}/${time}/video`;
+        videoSource.src = `/recordings/${camera_id}/${date}/${time}/video`;
 
         // find video element among children of recording_video_modal
         const video = recordingVideoModal.querySelector('video');
