@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 from glob import glob
 
-from flask import Blueprint, redirect, url_for, render_template, current_app, send_file
+from flask import Blueprint, redirect, url_for, render_template, current_app, send_file, request
 from vigi_agent.utils.media import generate_preview, read_video_file_meta
 
 from vigi_agent.cache import cache
@@ -13,7 +13,7 @@ recordings_blueprint = Blueprint('recordings', __name__)
 @recordings_blueprint.route('/recordings/<camera_id>/<date>/<time>/preview')
 @cache.cached(timeout=600) # Cache the preview for 10 minutes as it's a unlikely to change
 def preview(camera_id, date, time):
-    video_path = video_file_path(camera_id, date, time)
+    video_path = _video_file_path(camera_id, date, time)
 
     # TODO: Check if video_path exists
     jpg = generate_preview(video_path)
@@ -29,12 +29,15 @@ def video(camera_id, date, time):
     """
     Returns the video file for the given camera_id, date and time
     """
-    video_path = video_file_path(camera_id, date, time)
+    video_path = _video_file_path(camera_id, date, time)
 
     if not os.path.exists(video_path):
         return "Video not found", 404
+    
+    # if download=true is in the query string, the video will be downloaded
+    as_attachment = (request.args.get("download") == "true")
 
-    return send_file(video_path)
+    return send_file(video_path, as_attachment=as_attachment)
 
 
 @recordings_blueprint.route('/recordings')
@@ -69,12 +72,14 @@ def index():
                 "camera_id": camera_id,
             }
 
+            # find meta data for the recording in the database
             meta = database.find_recording(recording_date, time, camera_id)
             if meta:
                 recording_info["tags"] = meta["tags"]
 
             recordings[recording_date].append(recording_info)
 
+        # sort recordings by time
         recordings[recording_date].sort(key=lambda x: x["time"], reverse=True)
 
     database.close()
@@ -83,7 +88,10 @@ def index():
                            recording_dates=recording_dates,
                            recordings=recordings)
 
-def video_file_path(camera_id, date, time):
+def _video_file_path(camera_id, date, time):
+    """
+    Returns the absolute path to the video file for the given camera_id, date and time
+    """
     recording_path = current_app.agent_config.data_dir
     camera_id_dir = f"camera_{camera_id}"
     return os.path.abspath(os.path.join(recording_path, camera_id_dir, date, f"{time}.mp4"))
