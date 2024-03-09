@@ -31,8 +31,13 @@ if (recordingVideoModal) {
         const downloadLink = recordingVideoModal.querySelector('#download_link');
         downloadLink.href = `/recordings/${camera_id}/${date}/${time}/video?download=true`;
 
+        // update share link
         const shareLink = recordingVideoModal.querySelector('#share_link');
         shareLink.href = `/recordings/${camera_id}/${date}/${time}/video?share=true`;
+
+        // update delete link
+        const deleteLink = recordingVideoModal.querySelector('#delete_link');
+        deleteLink.href = `/recordings/${camera_id}/${date}/${time}/delete`;
 
         // find video element among children of recording_video_modal
         const video = recordingVideoModal.querySelector('video');
@@ -84,5 +89,33 @@ if (shareLink) {
             navigator.clipboard.writeText(event.target.href)
             .then(() => alert('Link copied to clipboard'))
         }
+    });
+}
+
+// handle delete_link click event
+const deleteLink = document.getElementById('delete_link');
+if (deleteLink) {
+    deleteLink.addEventListener('click', event => {
+        // ask for a confirmation
+        if (!confirm('Are you sure you want to delete this recording?')) {
+            // if the user clicks cancel, return
+            return;
+        }
+
+        // prevent the default action
+        event.preventDefault();
+
+        // send a DELETE request to the link's href
+        fetch(event.target.href, {
+            method: 'DELETE',
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('Recording deleted successfully');
+                location.reload();
+            } else {
+                alert('An error occurred while deleting the recording');
+            }
+        });
     });
 }

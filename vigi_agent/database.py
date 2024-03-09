@@ -69,6 +69,17 @@ class Database:
         cursor = self.conn.execute("SELECT * FROM recordings WHERE date = ? AND time = ? AND camera_id = ?", [date, time, camera_id])
         return cursor.fetchone()
 
+    def delete_recording(self, date, time, camera_id):
+        """
+        Delete the recording for the given date, time and camera_id
+        date: str, the date in the format YYYY-MM-DD
+        time: str, the time in the format HH:MM:SS
+        camera_id: int, the id of the camera
+        """
+        logging.debug(f"Deleting recording from database: {date}, {time}, {camera_id}")
+        self.conn.execute("DELETE FROM recordings WHERE date = ? AND time = ? AND camera_id = ?", [date, time, camera_id])
+        self.conn.commit()
+
     def close(self):
         logging.info("Closing database connection")
         self.conn.close()

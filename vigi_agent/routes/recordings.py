@@ -1,4 +1,5 @@
 import os
+import logging
 from pathlib import Path
 from glob import glob
 
@@ -38,6 +39,25 @@ def video(camera_id, date, time):
     as_attachment = (request.args.get("download") == "true")
 
     return send_file(video_path, as_attachment=as_attachment)
+
+
+# delete recording
+@recordings_blueprint.route('/recordings/<camera_id>/<date>/<time>/delete', methods=['DELETE'])
+def delete(camera_id, date, time):
+    logging.info(f"Deleting recording: {camera_id}/{date}/{time}")
+    database = Database(current_app.agent_config.db_path)
+    video_path = _video_file_path(camera_id, date, time)
+
+    # delete video file
+    if os.path.exists(video_path):
+        os.remove(video_path)
+
+    # delete meta data from database
+    database.delete_recording(date, time, camera_id)
+    database.close()
+
+    # return 200
+    return "", 200
 
 
 @recordings_blueprint.route('/recordings')
