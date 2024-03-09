@@ -9,6 +9,7 @@ from .motion_detector import MotionDetector
 
 from vigi_agent.utils.fps_calculator import FPSCalculator
 from .utils.pub_sub import PubSub
+from .database import Database
 
 
 class CameraMonitor(threading.Thread):
@@ -16,7 +17,7 @@ class CameraMonitor(threading.Thread):
     A class that monitors the camera for motion and publishes the video stream from the camera.
     """
 
-    def __init__(self, video_recorder = None, camera_id=0, max_errors=50, add_seconds_after_motion=10, notifier=None):
+    def __init__(self, video_recorder = None, camera_id=0, max_errors=50, add_seconds_after_motion=10, notifier=None, db_path=None):
         """
         max_errors: int - the maximum number of consecutive errors when reading a frame from the camera
                             before the camera monitor stops. It's used to prevent the camera monitor from
@@ -54,6 +55,12 @@ class CameraMonitor(threading.Thread):
         # A flag to stop the camera monitor
         self.should_stop = False
 
+        # The database to save the recordings
+        self.database = Database(db_path)
+
+        # A set of detected objects during the recording
+        self.detected_objects = set()
+
     def current_fps(self):
         """
         Returns the current FPS of the system using the FPS calculator if it has calculated the FPS,
@@ -80,6 +87,9 @@ class CameraMonitor(threading.Thread):
         if self.video_recorder.is_recording():
             logging.info("Motion detected while the video is being recorded.")
             return
+    
+        # reset the set of detected objects
+        self.detected_objects = set()
 
         # We need to determine the FPS of the camera to pass it to the video recorder
         # as FPS will be saved as metadata in the video file
@@ -130,7 +140,10 @@ class CameraMonitor(threading.Thread):
                 error_count = 0
 
                 # Apply the motion detector to the frame
-                frame = self.motion_detector.update(frame)
+                frame, detected_objects = self.motion_detector.update(frame)
+
+                # Add the detected objects to the set of detected objects
+                self.detected_objects.update(detected_objects)
 
                 # Publish the frame to the frame stream
                 self.frame_stream.publish(frame)
@@ -139,7 +152,7 @@ class CameraMonitor(threading.Thread):
                 if not self.motion_detector.is_motion_detected() and self.video_recorder.is_recording():
                     self.add_frames -= 1
                     if self.add_frames <= 0:
-                        self.video_recorder.еnd_recording()
+                        self.end_recording()
 
                 # here we send all frames to the video recorder, it's up to the video recorder to decide if
                 # it should record the frame or not. It could decide to record additional frames before and after
@@ -148,12 +161,21 @@ class CameraMonitor(threading.Thread):
                 self.fps_calculator.update()
 
         finally:
+
             if self.video_recorder.is_recording():
-                self.video_recorder.еnd_recording()
+                self.end_recording()
 
             # OpenCV cleanup
             logging.info("Releasing the camera...")
             camera.release()
+
+    def end_recording(self):
+        """
+        End the recording of the video to a file.
+        """
+        self.database.add_recording(date=self.video_recorder.date, time=self.video_recorder.time,
+                                    camera_id=self.camera_id, tags=','.join(self.detected_objects))
+        self.video_recorder.еnd_recording()
 
     def stop(self):
         """

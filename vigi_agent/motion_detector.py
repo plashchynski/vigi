@@ -37,7 +37,7 @@ class MotionDetector():
             self.skip_frames_count -= 1
 
             draw_title(original_frame, 'WARMING UP')
-            return original_frame
+            return (original_frame, set())
 
         # threshold the mask, the min_thresh value is set to 100
         # this value roughly impacts the sensitivity of the motion detection
@@ -62,9 +62,9 @@ class MotionDetector():
 
         cnt_area_thresh = 5000
         for cnt in contours:
-            x, y, w, h = cv2.boundingRect(cnt)
             area = cv2.contourArea(cnt)
             if area > cnt_area_thresh:
+                x, y, w, h = cv2.boundingRect(cnt)
                 detections.append([x, y, x + w, y + h])
 
         detections = np.array(detections)
@@ -92,16 +92,14 @@ class MotionDetector():
             # draw text on frame
             cv2.putText(original_frame, 'MOTION DETECTED', (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
+        detected_objects = set()
         if self.motion_detected:
             results = self.yolo(original_frame, verbose=False)
 
             for result in results:
                 for box, cls in zip(result.boxes.xyxy, result.boxes.cls):
                     label = result.names[int(cls)]
-
-                    if label != 'person':
-                        continue
-
+                    detected_objects.update([label])
                     display = False
 
                     # check if this box intersects with any of the detections
@@ -112,4 +110,4 @@ class MotionDetector():
                     if display:
                         draw_bbox(original_frame, box, label=label)
 
-        return original_frame
+        return (original_frame, detected_objects)

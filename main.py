@@ -2,6 +2,7 @@
 # and the command line arguments, initializes the logger, the notifier, the video recorder
 # and the camera monitor, and starts the Flask web server.
 
+import os
 import argparse
 import logging
 import configparser
@@ -17,7 +18,7 @@ from vigi_agent.app import app
 from vigi_agent.video_recorder import VideoRecorder
 from vigi_agent.camera_monitor import CameraMonitor
 
-
+from vigi_agent.database import Database
 
 
 def read_args():
@@ -111,13 +112,26 @@ app.agent_config.update_from_config(user_config)
 args = read_args()
 app.agent_config.update_from_args(args)
 
+# create data dir if it does not exist
+if not os.path.exists(app.agent_config.data_dir):
+    logging.info(f"Data directory does not exist, creating: {app.agent_config.data_dir}")
+    os.makedirs(app.agent_config.data_dir)
+
 init_logger(app.agent_config.debug)
 
 notifier = init_notifier(app.agent_config)
 
 logging.info("Initializing the video recorder... ")
-video_recorder = VideoRecorder(recording_path = app.agent_config.data_dir)
+video_recorder = VideoRecorder(
+        recording_path = app.agent_config.data_dir,
+        camera_id=app.agent_config.camera_id
+    )
 logging.info("Video recorder initialized successfully.")
+
+logging.info("Initializing the database... ")
+database = Database(app.agent_config.db_path)
+database.init_db()
+logging.info("Database initialized successfully.")
 
 if app.agent_config.no_monitor:
     logging.info("Camera monitor is disabled.")
@@ -127,7 +141,8 @@ else:
             video_recorder = video_recorder,
             camera_id = int(app.agent_config.camera_id),
             max_errors = int(app.agent_config.max_errors),
-            notifier = notifier
+            notifier = notifier,
+            db_path = app.agent_config.db_path
         )
     camera_monitor.start()
     app.camera_monitor = camera_monitor

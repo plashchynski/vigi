@@ -1,4 +1,6 @@
 # this class is used to validate and store the configuration of the agent
+import os
+
 from platformdirs import user_data_dir
 
 class AgentConfig:
@@ -13,6 +15,7 @@ class AgentConfig:
         self.twilio_config = None
         self.max_errors = 50
         self.no_monitor = False
+        self.db_path = os.path.join(self.data_dir, 'vigi.db')
 
     def set_port(self, port):
         # validate the port
@@ -32,6 +35,7 @@ class AgentConfig:
         if data_dir == '':
             raise ValueError('Data directory must not be empty')
         self.data_dir = data_dir
+        self.db_path = os.path.join(self.data_dir, 'vigi.db')
 
     def set_camera_id(self, camera_id):
         # validate the camera id
