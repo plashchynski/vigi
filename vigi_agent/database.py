@@ -1,3 +1,5 @@
+# This file contains the Database class which is used to interact with the SQLite database
+
 import logging
 import sqlite3
 
@@ -9,6 +11,23 @@ class Database:
         """
         self.db_path = db_path
         self.conn = sqlite3.connect(self.db_path)
+        self.conn.row_factory = self.dict_row_factory
+
+    def dict_row_factory(self, cursor, row):
+        """
+        Convert the row to a dictionary
+        cursor: sqlite3.Cursor
+        row: sqlite3.Row
+
+        The idea was taken from: https://stackoverflow.com/a/3300514
+        """
+
+        result = {}
+
+        for idx, col in enumerate(cursor.description):
+            result[col[0]] = row[idx]
+
+        return result
 
     def init_db(self):
         """
@@ -38,6 +57,17 @@ class Database:
         logging.debug(f"Adding recording to database: {date} {time} {camera_id} {tags}")
         self.conn.execute("INSERT INTO recordings (date, time, camera_id, tags) VALUES (?, ?, ?, ?)", (date, time, camera_id, tags))
         self.conn.commit()
+
+    def find_recording(self, date, time, camera_id):
+        """
+        Find the recordings for the given date
+        date: str, the date in the format YYYY-MM-DD
+        time: str, the time in the format HH:MM:SS
+        camera_id: int, the id of the camera
+        """
+        logging.debug(f"Finding recording in database: {date}, {time}, {camera_id}")
+        cursor = self.conn.execute("SELECT * FROM recordings WHERE date = ? AND time = ? AND camera_id = ?", [date, time, camera_id])
+        return cursor.fetchone()
 
     def close(self):
         logging.info("Closing database connection")
