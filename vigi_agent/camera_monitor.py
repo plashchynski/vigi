@@ -176,7 +176,8 @@ class CameraMonitor(threading.Thread):
         """
         End the recording of the video to a file.
         """
-        self.database.add_recording(date=self.video_recorder.date, time=self.video_recorder.time,
+        self.database.add_recording(date=self.video_recorder.recording_start_date,
+                                    time=self.video_recorder.recording_start_time,
                                     camera_id=self.camera_id, tags=','.join(self.detected_objects))
         self.video_recorder.еnd_recording()
 
