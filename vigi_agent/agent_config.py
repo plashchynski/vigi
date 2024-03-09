@@ -16,6 +16,7 @@ class AgentConfig:
         self.max_errors = 50
         self.no_monitor = False
         self.db_path = os.path.join(self.data_dir, 'vigi.db')
+        self.sensitivity = 0.5
 
     def set_port(self, port):
         # validate the port
@@ -55,6 +56,13 @@ class AgentConfig:
             raise ValueError('Max errors must be a positive integer')
         self.max_errors = max_errors
 
+    def set_sensitivity(self, sensitivity):
+        # set the sensitivity of the motion detector
+        sensitivity = float(sensitivity)
+        if sensitivity < 0 or sensitivity > 1:
+            raise ValueError('Sensitivity must be between 0 and 1')
+        self.sensitivity = sensitivity
+
     def update_from_args(self, args):
         # update the configuration from the command line arguments
         if args.port:
@@ -71,6 +79,8 @@ class AgentConfig:
             self.set_max_errors(args.max_errors)
         if args.no_monitor:
             self.no_monitor = True
+        if args.sensitivity:
+            self.set_sensitivity(args.sensitivity)
 
     def update_from_config(self, config):
         # update the configuration from the configuration file
@@ -88,6 +98,8 @@ class AgentConfig:
             self.set_max_errors(config['MaxErrors'])
         if 'NoMonitor' in config:
             self.no_monitor = config['NoMonitor'] == 'True'
+        if 'Sensitivity' in config:
+            self.set_sensitivity(config['Sensitivity'])
 
         # SMTP configuration
         if 'smtpServer' in config:

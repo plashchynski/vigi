@@ -17,12 +17,15 @@ class CameraMonitor(threading.Thread):
     A class that monitors the camera for motion and publishes the video stream from the camera.
     """
 
-    def __init__(self, video_recorder = None, camera_id=0, max_errors=50, add_seconds_after_motion=10, notifier=None, db_path=None):
+    def __init__(self, video_recorder = None, camera_id=0, max_errors=50, add_seconds_after_motion=10, notifier=None, db_path=None,
+                 sensitivity=0.5, debug=False):
         """
         max_errors: int - the maximum number of consecutive errors when reading a frame from the camera
                             before the camera monitor stops. It's used to prevent the camera monitor from
                             creating a big number of small recordings on each small motion.
         add_seconds_after_motion: int - the number of seconds to add to the video after the motion is detected
+        notifier: Notifier - a notifier object to send notifications about the motion
+        db_path: str - the path to the database file
         """
         super().__init__()
 
@@ -37,7 +40,11 @@ class CameraMonitor(threading.Thread):
         self.frame_stream = PubSub()
 
         # Initialize the motion detector, when motion is detected, the motion_callback will be called
-        self.motion_detector = MotionDetector(motion_callback=self.motion_callback)
+        self.motion_detector = MotionDetector(
+                motion_callback=self.motion_callback,
+                debug=debug,
+                sensitivity=sensitivity
+            )
 
         # video_recorder is used to save the video to a file when motion is detected
         self.video_recorder = video_recorder

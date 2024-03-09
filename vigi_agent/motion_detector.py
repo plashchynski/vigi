@@ -6,8 +6,17 @@ from vigi_agent.utils.spatial import boxes_intersect
 from vigi_agent.utils.drawing import draw_bboxes, draw_bbox, draw_title
 
 class MotionDetector():
-    def __init__(self, motion_callback, debug=False):
-        self.back_sub = cv2.createBackgroundSubtractorMOG2(varThreshold=100, detectShadows=True)
+    def __init__(self, motion_callback, debug=False, sensitivity=0.5):
+        """
+        Initialize the motion detector with the given sensitivity and motion callback.
+        The motion callback is called when motion is detected.
+        sensitivity: float, the sensitivity of the motion detector, should be between 0 and 1
+        """
+        self.sensitivity = sensitivity
+        self.back_sub = cv2.createBackgroundSubtractorMOG2(
+            varThreshold=(50 / self.sensitivity), # the higher the sensitivity, the lower the threshold
+            detectShadows=True
+        )
         self.motion_callback = motion_callback
         self.motion_detected = False
         self.debug = debug
@@ -39,9 +48,9 @@ class MotionDetector():
             draw_title(original_frame, 'WARMING UP')
             return (original_frame, set())
 
-        # threshold the mask, the min_thresh value is set to 100
+        # threshold the mask, the min_thresh value is set to 100 by default
         # this value roughly impacts the sensitivity of the motion detection
-        min_thresh = 100
+        min_thresh = 50 / self.sensitivity # the higher the sensitivity, the lower the threshold
         _, motion_mask = cv2.threshold(fg_mask, thresh = min_thresh, maxval = 255, type = cv2.THRESH_BINARY)
 
         # median blur to remove granular noise
@@ -60,7 +69,7 @@ class MotionDetector():
         contours, _ = cv2.findContours(motion_mask, mode = cv2.RETR_EXTERNAL, method = cv2.CHAIN_APPROX_SIMPLE)
         detections = []
 
-        cnt_area_thresh = 5000
+        cnt_area_thresh = (2500 / self.sensitivity) # the higher the sensitivity, the lower the are threshold
         for cnt in contours:
             area = cv2.contourArea(cnt)
             if area > cnt_area_thresh:
