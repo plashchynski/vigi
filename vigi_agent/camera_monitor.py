@@ -81,7 +81,7 @@ class CameraMonitor(threading.Thread):
         logging.info("Motion detected!")
 
         # send a notification about the motion
-        self.notifier.notify(f"Motion was detected by the camera with ID={self.camera_id}")
+        self.notifier.notify(f"Motion was detected by the camera #{self.camera_id}")
 
         self.add_frames = self.add_seconds_after_motion * self.current_fps()
 
@@ -179,6 +179,10 @@ class CameraMonitor(threading.Thread):
         self.database.add_recording(date=self.video_recorder.recording_start_date,
                                     time=self.video_recorder.recording_start_time,
                                     camera_id=self.camera_id, tags=','.join(self.detected_objects))
+
+        # send a notification about the detected objects
+        self.notifier.notify(f"Moving objects detected: {', '.join(self.detected_objects)} by the camera #{self.camera_id}")
+
         self.video_recorder.еnd_recording()
 
     def stop(self):
