@@ -30,6 +30,26 @@ if (recordingVideoModal) {
         // find video element among children of recording_video_modal
         const video = recordingVideoModal.querySelector('video');
 
+        // read tags and update the tags element
+        const tagsElement = recordingVideoModal.querySelector('#tags');
+
+        // remove all children from #tags element
+        while (tagsElement.firstChild) {
+            tagsElement.removeChild(tagsElement.firstChild);
+        }
+
+        // split tags by comma
+        const tags = recordingVideo.dataset.tags.split(',');
+        
+        // for each tag in tags create a span with badge bg-secondary classes and
+        // append it to the tagsElement element
+        tags.forEach(tag => {
+            const span = document.createElement('span');
+            span.className = "badge text-bg-info ms-1";
+            span.textContent = tag;
+            tagsElement.appendChild(span);
+        });
+
         // load and play the video
         video.load();
         video.play();

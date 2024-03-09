@@ -24,7 +24,10 @@
             <div class="d-flex align-content-start flex-wrap">
               {% for recording in recordings[recording_date] %}
                 <a data-bs-toggle="modal" data-bs-target="#recording_video_modal">
-                  <div class="recording_card card m-2" style="width: 18rem;" data-camera-id="{{ recording["camera_id"] }}" data-time="{{ recording["time"] }}">
+                  <div class="recording_card card m-2" style="width: 18rem;"
+                      data-camera-id="{{ recording["camera_id"] }}"
+                      data-time="{{ recording["time"] }}"
+                      data-tags="{{ recording.get("tags") }}">
                     <img src="{{ url_for('recordings.preview', camera_id = recording["camera_id"], date = recording_date, time = recording["time"]) }}" class="card-img-top">
                     <div class="card-body">
                       <p class="card-text">
@@ -56,6 +59,9 @@
           <source id="video_source" src="" type="video/mp4">
           Your browser does not support the video tag.
         </video>
+        <div>
+          Detected objects: <span id="tags" class="m-0 border-0"></span>
+        </div>
       </div>
     </div>
   </div>
