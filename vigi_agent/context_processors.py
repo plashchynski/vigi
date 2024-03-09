@@ -9,6 +9,13 @@ def utility_processor():
         # format time as HH:MM:SS
         return time.replace('-', ':')
 
+    def format_date(date):
+        # read date as YYYY-MM-DD
+        date = datetime.datetime.strptime(date, '%Y-%m-%d')
+
+        # format date as natural language
+        return humanize.naturaldate(date)
+
     def format_duration(duration):
         if duration is None:
             return "N/A"
@@ -18,5 +25,6 @@ def utility_processor():
 
     return dict(
             format_time=format_time,
-            format_duration=format_duration
+            format_duration=format_duration,
+            format_date=format_date
         )
