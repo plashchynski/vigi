@@ -55,11 +55,12 @@ class CameraMonitor(threading.Thread):
         # A flag to stop the camera monitor
         self.should_stop = False
 
-        # The database to save the recordings
-        self.database = Database(db_path)
-
         # A set of detected objects during the recording
         self.detected_objects = set()
+
+        # we can't initialize the database here, because the database should be initialized in
+        # the same thread where it's used, but __init__ is called in the main thread
+        self.db_path = db_path
 
     def current_fps(self):
         """
@@ -100,6 +101,9 @@ class CameraMonitor(threading.Thread):
                                             fps=self.current_fps())
 
     def run(self):
+        # Connect to the database. We need to connect to the database in the same thread where it's used
+        self.database = Database(self.db_path)
+
         # Initialize the camera with OpenCV
         logging.info("Starting camera monitor... ")
         camera = cv2.VideoCapture(self.camera_id)  # Use 0 for the first webcam
@@ -161,7 +165,6 @@ class CameraMonitor(threading.Thread):
                 self.fps_calculator.update()
 
         finally:
-
             if self.video_recorder.is_recording():
                 self.end_recording()
 
