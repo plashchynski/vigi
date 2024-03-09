@@ -25,7 +25,6 @@
                     <img src="{{ url_for('static', filename='logo.png') }}" width="24" height="24" class="d-inline-block align-top" alt="">
                     ViGi
                 </a>
-
                 <ul class="navbar-nav">
                     <li class="nav-item">
                         <a class="nav-link {% if request.path == url_for('live.index') %}active{% endif %}" aria-current="page" href="{{ url_for('live.index') }}">

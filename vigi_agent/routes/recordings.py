@@ -12,7 +12,7 @@ from vigi_agent.database import Database
 recordings_blueprint = Blueprint('recordings', __name__)
 
 @recordings_blueprint.route('/recordings/<camera_id>/<date>/<time>/preview')
-@cache.cached(timeout=600) # Cache the preview for 10 minutes as it's a unlikely to change
+@cache.cached(timeout=24*60*60) # Cache the preview for 24 hours as it's a unlikely to change
 def preview(camera_id, date, time):
     video_path = _video_file_path(camera_id, date, time)
 
@@ -107,6 +107,7 @@ def index():
     return render_template('recordings/index.html',
                            recording_dates=recording_dates,
                            recordings=recordings)
+
 
 def _video_file_path(camera_id, date, time):
     """
