@@ -31,6 +31,9 @@ if (recordingVideoModal) {
         const downloadLink = recordingVideoModal.querySelector('#download_link');
         downloadLink.href = `/recordings/${camera_id}/${date}/${time}/video?download=true`;
 
+        const shareLink = recordingVideoModal.querySelector('#share_link');
+        shareLink.href = `/recordings/${camera_id}/${date}/${time}/video?share=true`;
+
         // find video element among children of recording_video_modal
         const video = recordingVideoModal.querySelector('video');
 
@@ -57,5 +60,29 @@ if (recordingVideoModal) {
         // load and play the video
         video.load();
         video.play();
+    });
+}
+
+// handle the click event on the share_link
+const shareLink = document.getElementById('share_link');
+if (shareLink) {
+    shareLink.addEventListener('click', event => {
+        // prevent the default action
+        event.preventDefault();
+
+        // use navigator.share if available
+        if (navigator.share) {
+            navigator.share({
+                title: 'Vigi Agent',
+                text: 'Check out this video',
+                url: event.target.href,
+            })
+            .then(() => console.log('Successful share'))
+            .catch((error) => console.log('Error sharing', error));
+        } else {
+            // if navigator.share is not available, copy the link to the clipboard
+            navigator.clipboard.writeText(event.target.href)
+            .then(() => alert('Link copied to clipboard'))
+        }
     });
 }
