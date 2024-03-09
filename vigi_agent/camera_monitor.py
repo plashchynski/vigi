@@ -188,5 +188,8 @@ class CameraMonitor(threading.Thread):
         logging.info("Shutting down the camera monitor...")
         self.should_stop = True
 
+        # close the database connection to save the data
+        self.database.close()
+
         # wait for the camera monitor to stop
         self.join()

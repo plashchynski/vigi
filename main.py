@@ -131,6 +131,11 @@ logging.info("Video recorder initialized successfully.")
 logging.info("Initializing the database... ")
 database = Database(app.agent_config.db_path)
 database.init_db()
+
+# close the database connection after initializing the database 
+# as it's not used in the main thread
+database.close()
+
 logging.info("Database initialized successfully.")
 
 if app.agent_config.no_monitor:
