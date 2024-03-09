@@ -84,3 +84,11 @@ class Database:
         logging.info("Closing database connection")
         self.conn.close()
         self.conn = None
+
+    def integrity_check(self):
+        """
+        Run the integrity check on the database
+        """
+        logging.info("Running integrity check on the database")
+        self.conn.execute("PRAGMA integrity_check")
+        logging.info("Integrity check completed")
