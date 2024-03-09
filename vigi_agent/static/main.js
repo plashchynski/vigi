@@ -27,6 +27,10 @@ if (recordingVideoModal) {
         // update src attribute of the video source
         videoSource.src = `/recordings/${camera_id}/${date}/${time}/video`;
 
+        // update download link
+        const downloadLink = recordingVideoModal.querySelector('#download_link');
+        downloadLink.href = `/recordings/${camera_id}/${date}/${time}/video?download=true`;
+
         // find video element among children of recording_video_modal
         const video = recordingVideoModal.querySelector('video');
 
