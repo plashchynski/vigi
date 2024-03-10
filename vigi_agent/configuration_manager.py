@@ -3,20 +3,20 @@ import os
 
 from platformdirs import user_data_dir
 
+from .camera_config import CameraConfig
+
 class ConfigurationManager:
     def __init__(self):
         # default configuration
         self.port = 5000
         self.host = 'localhost'
         self.data_dir = user_data_dir('vigi-agent', 'Vigi')
-        self.camera_id = 0
         self.debug = False
         self.smtp_server_config = None
         self.twilio_config = None
-        self.max_errors = 50
         self.no_monitor = False
         self.db_path = os.path.join(self.data_dir, 'vigi.db')
-        self.sensitivity = 0.5
+        self.cameras_config = {}
 
     def set_port(self, port):
         # validate the port
@@ -38,49 +38,34 @@ class ConfigurationManager:
         self.data_dir = data_dir
         self.db_path = os.path.join(self.data_dir, 'vigi.db')
 
-    def set_camera_id(self, camera_id):
-        # validate the camera id
-        camera_id = int(camera_id)
-        if camera_id < 0:
-            raise ValueError('Camera id must be a positive integer')
-        self.camera_id = camera_id
-
     def set_debug(self, debug):
         # set the debug mode
         self.debug = debug
 
-    def set_max_errors(self, max_errors):
-        # set the maximum number of consecutive errors when reading a frame from the camera
-        max_errors = int(max_errors)
-        if max_errors < 0:
-            raise ValueError('Max errors must be a positive integer')
-        self.max_errors = max_errors
-
-    def set_sensitivity(self, sensitivity):
-        # set the sensitivity of the motion detector
-        sensitivity = float(sensitivity)
-        if sensitivity < 0 or sensitivity > 1:
-            raise ValueError('Sensitivity must be between 0 and 1')
-        self.sensitivity = sensitivity
-
-    def update_from_args(self, args):
+    def update_from_args(self, cmd_args):        
         # update the configuration from the command line arguments
-        if args.port:
-            self.set_port(args.port)
-        if args.host:
-            self.set_host(args.host)
-        if args.data_dir:
-            self.set_data_dir(args.data_dir)
-        if args.camera_id:
-            self.set_camera_id(args.camera_id)
-        if args.debug:
+        if cmd_args.port:
+            self.set_port(cmd_args.port)
+        if cmd_args.host:
+            self.set_host(cmd_args.host)
+        if cmd_args.data_dir:
+            self.set_data_dir(cmd_args.data_dir)
+        if cmd_args.debug:
             self.set_debug(True)
-        if args.max_errors:
-            self.set_max_errors(args.max_errors)
-        if args.no_monitor:
+        if cmd_args.no_monitor:
             self.no_monitor = True
-        if args.sensitivity:
-            self.set_sensitivity(args.sensitivity)
+
+        if cmd_args.camera_id is not None:
+            # configure the camera
+            camera_config = CameraConfig()
+            camera_config.set_camera_id(cmd_args.camera_id)
+
+            if cmd_args.max_errors:
+                camera_config.set_max_errors(cmd_args.max_errors)
+            if cmd_args.sensitivity:
+                cmd_args.set_sensitivity(cmd_args.sensitivity)
+
+            self.cameras_config[camera_config.camera_id] = camera_config
 
     def update_from_config(self, config):
         # update the configuration from the configuration file
@@ -90,16 +75,16 @@ class ConfigurationManager:
             self.set_host(config['Host'])
         if 'DataDir' in config:
             self.set_data_dir(config['DataDir'])
-        if 'CameraID' in config:
-            self.set_camera_id(config['CameraID'])
+        # if 'CameraID' in config:
+        #     self.set_camera_id(config['CameraID'])
         if 'Debug' in config:
             self.set_debug(config['Debug'] == 'True')
-        if 'MaxErrors' in config:
-            self.set_max_errors(config['MaxErrors'])
+        # if 'MaxErrors' in config:
+        #     self.set_max_errors(config['MaxErrors'])
         if 'NoMonitor' in config:
             self.no_monitor = config['NoMonitor'] == 'True'
-        if 'Sensitivity' in config:
-            self.set_sensitivity(config['Sensitivity'])
+        # if 'Sensitivity' in config:
+        #     self.set_sensitivity(config['Sensitivity'])
 
         # SMTP configuration
         if 'smtpServer' in config:

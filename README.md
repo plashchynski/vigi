@@ -48,6 +48,20 @@ options:
                         Maximum number of consecutive errors when reading a frame from the camera
 ```
 
+## Install on Raspberry Pi (Raspberry Pi OS)
+
+```bash
+curl https://pyenv.run | bash # install pyenv
+
+# initialize pyenv:
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+
+pyenv install 3.12.2 # install Python 3.12
+```
+
 ## Debugging Flask app
 
 If you want to run the Flask app in debug mode without the camera monitor, you can do so by running the following command:

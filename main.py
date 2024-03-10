@@ -122,13 +122,6 @@ init_logger(app.configuration_manager.debug)
 
 notifier = init_notifier(app.configuration_manager)
 
-logging.info("Initializing the video recorder... ")
-video_recorder = VideoRecorder(
-        recording_path = app.configuration_manager.data_dir,
-        camera_id=app.configuration_manager.camera_id
-    )
-logging.info("Video recorder initialized successfully.")
-
 logging.info("Initializing the database... ")
 database = Database(app.configuration_manager.db_path)
 database.init_db()
@@ -145,39 +138,28 @@ if app.configuration_manager.no_monitor:
 else:
     app.camera_monitors = {}
 
-    logging.info("Starting the camera monitor... ")
-    camera_monitor = CameraMonitor(
+    for camera_id, camera_config in app.configuration_manager.cameras_config.items():
+        logging.info("Initializing the video recorder... ")
+        video_recorder = VideoRecorder(
+            recording_path = app.configuration_manager.data_dir,
+            camera_id=camera_id
+        )
+        logging.info("Video recorder initialized successfully.")
+
+        # create a camera monitor for each camera
+        logging.info(f"Starting the camera monitor for camera {camera_id}... ")
+        camera_monitor = CameraMonitor(
             video_recorder = video_recorder,
-            camera_id = int(app.configuration_manager.camera_id),
-            max_errors = int(app.configuration_manager.max_errors),
+            camera_id = camera_id,
+            max_errors = camera_config.max_errors,
             notifier = notifier,
             db_path = app.configuration_manager.db_path,
-            sensitivity=app.configuration_manager.sensitivity,
+            sensitivity=camera_config.sensitivity,
             debug=app.configuration_manager.debug
         )
-    camera_monitor.start()
-    app.camera_monitors[int(app.configuration_manager.camera_id)] = camera_monitor
-    logging.info("Camera monitor started successfully.")
-
-    video_recorder2 = VideoRecorder(
-        recording_path = app.configuration_manager.data_dir,
-        camera_id=1
-    )
-
-    # another camera monitor
-    logging.info("Starting the second camera monitor... ")
-    camera_monitor2 = CameraMonitor(
-        video_recorder = video_recorder2,
-        camera_id = 1,
-        max_errors = int(app.configuration_manager.max_errors),
-        notifier = notifier,
-        db_path = app.configuration_manager.db_path,
-        sensitivity=app.configuration_manager.sensitivity,
-        debug=app.configuration_manager.debug
-    )
-    camera_monitor2.start()
-    app.camera_monitors[1] = camera_monitor2
-    logging.info("Second camera monitor started successfully.")
+        camera_monitor.start()
+        app.camera_monitors[camera_id] = camera_monitor
+        logging.info(f"Camera monitor for camera {camera_id} started successfully.")
 
 def graceful_exit():
     logging.info("Exiting the application... ")
