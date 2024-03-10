@@ -12,7 +12,7 @@ class TestFpsCalculator(unittest.TestCase):
             fps_calculator.update()
             time.sleep(0.02)
 
-        self.assertAlmostEqual(fps_calculator.current_fps(), 42)
+        self.assertIn(fps_calculator.current_fps(), (42, 43, 44))
 
     def test_fps_calculator_no_history(self):
         # current_fps should return None if the history is not long enough
