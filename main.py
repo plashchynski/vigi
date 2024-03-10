@@ -157,10 +157,34 @@ else:
     app.camera_monitor = camera_monitor
     logging.info("Camera monitor started successfully.")
 
+    video_recorder2 = VideoRecorder(
+        recording_path = app.agent_config.data_dir,
+        camera_id=1
+    )
+
+    # another camera monitor
+    logging.info("Starting the second camera monitor... ")
+    camera_monitor2 = CameraMonitor(
+        video_recorder = video_recorder2,
+        camera_id = 1,
+        max_errors = int(app.agent_config.max_errors),
+        notifier = notifier,
+        db_path = app.agent_config.db_path,
+        sensitivity=app.agent_config.sensitivity,
+        debug=app.agent_config.debug
+    )
+    camera_monitor2.start()
+    app.camera_monitor2 = camera_monitor2
+    logging.info("Second camera monitor started successfully.")
+
 def graceful_exit():
     logging.info("Exiting the application... ")
     if hasattr(app, 'camera_monitor'):
         app.camera_monitor.stop()
+
+    if hasattr(app, 'camera_monitor2'):
+        app.camera_monitor2.stop()
+
     logging.info("Application exited successfully.")
 
 atexit.register(graceful_exit)
