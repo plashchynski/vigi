@@ -55,17 +55,21 @@ class ConfigurationManager:
         if cmd_args.no_monitor:
             self.no_monitor = True
 
+        # configure at leas one camera
+        camera_id = 0
         if cmd_args.camera_id is not None:
-            # configure the camera
-            camera_config = CameraConfig()
-            camera_config.set_camera_id(cmd_args.camera_id)
+            camera_id = cmd_args.camera_id
 
-            if cmd_args.max_errors:
-                camera_config.set_max_errors(cmd_args.max_errors)
-            if cmd_args.sensitivity:
-                cmd_args.set_sensitivity(cmd_args.sensitivity)
+        # configure the camera
+        camera_config = CameraConfig()
+        camera_config.set_camera_id(camera_id)
 
-            self.cameras_config[camera_config.camera_id] = camera_config
+        if cmd_args.max_errors:
+            camera_config.set_max_errors(cmd_args.max_errors)
+        if cmd_args.sensitivity:
+            cmd_args.set_sensitivity(cmd_args.sensitivity)
+
+        self.cameras_config[camera_id] = camera_config
 
     def update_from_config(self, config):
         # update the configuration from the configuration file
