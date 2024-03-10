@@ -119,3 +119,24 @@ if (deleteLink) {
         });
     });
 }
+
+const liveVideoModal = document.getElementById('live_video_modal');
+if (liveVideoModal) {
+    liveVideoModal.addEventListener('show.bs.modal', event => {
+        // Button that triggered the modal
+        const button = event.relatedTarget;
+
+        // find a child element with class 'live_view_img'
+        // copy src attribute of the img element
+        const src = button.querySelector(".live_view_img").src
+
+        // update src of #live_video_modal_img
+        const liveVideoModalImg = liveVideoModal.querySelector('#live_video_modal_img');
+        liveVideoModalImg.src = src;
+
+        // update modal title
+        const modalTitle = liveVideoModal.querySelector('#modalTitle');
+        const card_title = button.querySelector('.card-title');
+        modalTitle.textContent = `Live view from ${card_title.textContent}`;
+    });
+}

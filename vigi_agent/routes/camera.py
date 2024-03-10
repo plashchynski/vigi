@@ -45,7 +45,7 @@ def generate_frames(camera_monitor):
 
 
 # route for video streaming
-@camera_blueprint.route('/camera/<camera_id>')
+@camera_blueprint.route('/camera/<camera_id>/live')
 def camera(camera_id):
     camera_id = int(camera_id)
     camera_monitor = None

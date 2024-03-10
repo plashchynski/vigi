@@ -42,7 +42,6 @@ class CameraMonitor(threading.Thread):
         # Initialize the motion detector, when motion is detected, the motion_callback will be called
         self.motion_detector = MotionDetector(
                 motion_callback=self.motion_callback,
-                debug=debug,
                 sensitivity=sensitivity
             )
 
