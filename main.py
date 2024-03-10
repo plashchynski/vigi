@@ -143,6 +143,8 @@ logging.info("Database initialized successfully.")
 if app.agent_config.no_monitor:
     logging.info("Camera monitor is disabled.")
 else:
+    app.camera_monitors = {}
+
     logging.info("Starting the camera monitor... ")
     camera_monitor = CameraMonitor(
             video_recorder = video_recorder,
@@ -154,7 +156,7 @@ else:
             debug=app.agent_config.debug
         )
     camera_monitor.start()
-    app.camera_monitor = camera_monitor
+    app.camera_monitors[int(app.agent_config.camera_id)] = camera_monitor
     logging.info("Camera monitor started successfully.")
 
     video_recorder2 = VideoRecorder(
@@ -174,17 +176,14 @@ else:
         debug=app.agent_config.debug
     )
     camera_monitor2.start()
-    app.camera_monitor2 = camera_monitor2
+    app.camera_monitors[1] = camera_monitor2
     logging.info("Second camera monitor started successfully.")
 
 def graceful_exit():
     logging.info("Exiting the application... ")
-    if hasattr(app, 'camera_monitor'):
-        app.camera_monitor.stop()
-
-    if hasattr(app, 'camera_monitor2'):
-        app.camera_monitor2.stop()
-
+    if hasattr(app, 'camera_monitors'):
+        for camera_monitor in app.camera_monitors.values():
+            camera_monitor.stop()
     logging.info("Application exited successfully.")
 
 atexit.register(graceful_exit)

@@ -47,11 +47,12 @@ def generate_frames(camera_monitor):
 # route for video streaming
 @camera_blueprint.route('/camera/<camera_id>')
 def camera(camera_id):
+    camera_id = int(camera_id)
     camera_monitor = None
-    if hasattr(current_app, 'camera_monitor'):
-        if int(camera_id) == 0:
-            camera_monitor = current_app.camera_monitor
-        else:
-            camera_monitor = current_app.camera_monitor2
+    if hasattr(current_app, 'camera_monitors'):
+        camera_monitor = current_app.camera_monitors.get(camera_id)
+
+        if camera_monitor is None:
+            return Response("Camera monitor not found", status=404)
 
     return Response(generate_frames(camera_monitor), mimetype='multipart/x-mixed-replace; boundary=frame')
