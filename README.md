@@ -1,5 +1,13 @@
 # ViGi: A camera surveillance system
 
+## Features
+
+* Motion detection
+* Object recognition
+* Multiple camera support
+* Web server to view the camera feed and recordings
+* Notifications via SMS and email
+
 ## Requirements
 
 - Python 3.12
@@ -48,7 +56,7 @@ options:
                         Maximum number of consecutive errors when reading a frame from the camera
 ```
 
-## Install on Raspberry Pi (Raspberry Pi OS)
+## Installation on Raspberry Pi (Raspberry Pi OS)
 
 ```bash
 curl https://pyenv.run | bash # install pyenv
@@ -60,6 +68,17 @@ eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
 
 pyenv install 3.12.2 # install Python 3.12
+pyenv virtualenv 3.12.2 vigi # create a virtual environment
+pyenv activate vigi # activate the virtual environment
+
+# install the required packages
+pip install -r requirements.txt
+
+# Download a YOLOv8 nano model:
+wget https://github.com/ultralytics/assets/releases/download/v8.1.0/yolov8n.pt
+
+# run the agent
+python main.py
 ```
 
 ## Debugging Flask app
