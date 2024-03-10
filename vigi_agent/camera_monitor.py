@@ -179,6 +179,9 @@ class CameraMonitor(threading.Thread):
             logging.info("Releasing the camera...")
             camera.release()
 
+            # close the database connection to save the data
+            self.database.close()
+
     def end_recording(self):
         """
         End the recording of the video to a file.
@@ -198,9 +201,6 @@ class CameraMonitor(threading.Thread):
         """
         logging.info("Shutting down the camera monitor...")
         self.should_stop = True
-
-        # close the database connection to save the data
-        self.database.close()
 
         # wait for the camera monitor to stop
         self.join()
