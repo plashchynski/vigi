@@ -63,7 +63,17 @@ Download a samples dataset for the motion detection tests from [here](https://dr
 Then run the tests:
 
 ```bash
-python -m unittest tests/**/*.py
+python -m unittest discover
+```
+
+## Test coverage
+
+To generate a coverage report, run the following command:
+
+```bash
+pip install coverage
+coverage run -m unittest discover
+coverage html
 ```
 
 # Notification services
