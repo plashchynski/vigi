@@ -3,7 +3,7 @@ import os
 
 from platformdirs import user_data_dir
 
-class AgentConfig:
+class ConfigurationManager:
     def __init__(self):
         # default configuration
         self.port = 5000

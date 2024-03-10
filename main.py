@@ -8,7 +8,7 @@ import logging
 import configparser
 import atexit
 
-from vigi_agent.agent_config import AgentConfig
+from vigi_agent.configuration_manager import ConfigurationManager
 
 from vigi_agent.notification_providers.email_notification_provider import EmailNotificationProvider
 from vigi_agent.notification_providers.sms_notification_provider import SMSNotificationProvider
@@ -66,14 +66,14 @@ def init_logger(debug):
         logging.basicConfig(level=logging.INFO)
 
 
-def init_notifier(agent_config):
+def init_notifier(configuration_manager):
     """
     Initialize the notifier and its notification providers.
     """
     logging.info("Initializing the notifier... ")
     notification_providers = []
-    if agent_config.smtp_server_config:
-        smtp_server_config = agent_config.smtp_server_config
+    if configuration_manager.smtp_server_config:
+        smtp_server_config = configuration_manager.smtp_server_config
         email_notification_provider = EmailNotificationProvider(
                 smtp_server = smtp_server_config['smtpServer'],
                 smtp_port = int(smtp_server_config['smtpPort']),
@@ -84,8 +84,8 @@ def init_notifier(agent_config):
             )
         notification_providers.append(email_notification_provider)
 
-    if agent_config.twilio_config:
-        twilio_config = agent_config.twilio_config
+    if configuration_manager.twilio_config:
+        twilio_config = configuration_manager.twilio_config
         sms_notification_provider = SMSNotificationProvider(
                 account_sid = twilio_config['twilioAccountSid'],
                 auth_token = twilio_config['twilioAuthToken'],
@@ -102,35 +102,35 @@ def init_notifier(agent_config):
 
 
 # Initialize the configuration with the default values
-app.agent_config = AgentConfig()
+app.configuration_manager = ConfigurationManager()
 
 # First, read the configuration file and update the configuration
 user_config = read_config()
-app.agent_config.update_from_config(user_config)
+app.configuration_manager.update_from_config(user_config)
 
 # Then, read the command line arguments and update the configuration
 # the command line arguments take precedence over the configuration file
 args = read_args()
-app.agent_config.update_from_args(args)
+app.configuration_manager.update_from_args(args)
 
 # create data dir if it does not exist
-if not os.path.exists(app.agent_config.data_dir):
-    logging.info(f"Data directory does not exist, creating: {app.agent_config.data_dir}")
-    os.makedirs(app.agent_config.data_dir)
+if not os.path.exists(app.configuration_manager.data_dir):
+    logging.info(f"Data directory does not exist, creating: {app.configuration_manager.data_dir}")
+    os.makedirs(app.configuration_manager.data_dir)
 
-init_logger(app.agent_config.debug)
+init_logger(app.configuration_manager.debug)
 
-notifier = init_notifier(app.agent_config)
+notifier = init_notifier(app.configuration_manager)
 
 logging.info("Initializing the video recorder... ")
 video_recorder = VideoRecorder(
-        recording_path = app.agent_config.data_dir,
-        camera_id=app.agent_config.camera_id
+        recording_path = app.configuration_manager.data_dir,
+        camera_id=app.configuration_manager.camera_id
     )
 logging.info("Video recorder initialized successfully.")
 
 logging.info("Initializing the database... ")
-database = Database(app.agent_config.db_path)
+database = Database(app.configuration_manager.db_path)
 database.init_db()
 database.integrity_check()
 
@@ -140,7 +140,7 @@ database.close()
 
 logging.info("Database initialized successfully.")
 
-if app.agent_config.no_monitor:
+if app.configuration_manager.no_monitor:
     logging.info("Camera monitor is disabled.")
 else:
     app.camera_monitors = {}
@@ -148,19 +148,19 @@ else:
     logging.info("Starting the camera monitor... ")
     camera_monitor = CameraMonitor(
             video_recorder = video_recorder,
-            camera_id = int(app.agent_config.camera_id),
-            max_errors = int(app.agent_config.max_errors),
+            camera_id = int(app.configuration_manager.camera_id),
+            max_errors = int(app.configuration_manager.max_errors),
             notifier = notifier,
-            db_path = app.agent_config.db_path,
-            sensitivity=app.agent_config.sensitivity,
-            debug=app.agent_config.debug
+            db_path = app.configuration_manager.db_path,
+            sensitivity=app.configuration_manager.sensitivity,
+            debug=app.configuration_manager.debug
         )
     camera_monitor.start()
-    app.camera_monitors[int(app.agent_config.camera_id)] = camera_monitor
+    app.camera_monitors[int(app.configuration_manager.camera_id)] = camera_monitor
     logging.info("Camera monitor started successfully.")
 
     video_recorder2 = VideoRecorder(
-        recording_path = app.agent_config.data_dir,
+        recording_path = app.configuration_manager.data_dir,
         camera_id=1
     )
 
@@ -169,11 +169,11 @@ else:
     camera_monitor2 = CameraMonitor(
         video_recorder = video_recorder2,
         camera_id = 1,
-        max_errors = int(app.agent_config.max_errors),
+        max_errors = int(app.configuration_manager.max_errors),
         notifier = notifier,
-        db_path = app.agent_config.db_path,
-        sensitivity=app.agent_config.sensitivity,
-        debug=app.agent_config.debug
+        db_path = app.configuration_manager.db_path,
+        sensitivity=app.configuration_manager.sensitivity,
+        debug=app.configuration_manager.debug
     )
     camera_monitor2.start()
     app.camera_monitors[1] = camera_monitor2
@@ -190,10 +190,10 @@ atexit.register(graceful_exit)
 
 logging.info("Starting the Flask web server... ")
 flask_debug = False
-if app.agent_config.debug and app.agent_config.no_monitor:
+if app.configuration_manager.debug and app.configuration_manager.no_monitor:
     # enable debug mode if the monitor is disabled, because
     # it cause race conditions in multithreading
     flask_debug = True
     logging.warning("Flask debug mode is enabled.")
 
-app.run(host=app.agent_config.host, port=app.agent_config.port, debug=flask_debug)
+app.run(host=app.configuration_manager.host, port=app.configuration_manager.port, debug=flask_debug)

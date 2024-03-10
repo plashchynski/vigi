@@ -45,7 +45,7 @@ def video(camera_id, date, time):
 @recordings_blueprint.route('/recordings/<camera_id>/<date>/<time>/delete', methods=['DELETE'])
 def delete(camera_id, date, time):
     logging.info(f"Deleting recording: {camera_id}/{date}/{time}")
-    database = Database(current_app.agent_config.db_path)
+    database = Database(current_app.configuration_manager.db_path)
     video_path = _video_file_path(camera_id, date, time)
 
     # delete video file
@@ -62,8 +62,8 @@ def delete(camera_id, date, time):
 
 @recordings_blueprint.route('/recordings')
 def index():
-    database = Database(current_app.agent_config.db_path)
-    recording_path = current_app.agent_config.data_dir
+    database = Database(current_app.configuration_manager.db_path)
+    recording_path = current_app.configuration_manager.data_dir
 
     recordings = glob(os.path.join(recording_path, "**", "**", "*.mp4"))
 
@@ -113,6 +113,6 @@ def _video_file_path(camera_id, date, time):
     """
     Returns the absolute path to the video file for the given camera_id, date and time
     """
-    recording_path = current_app.agent_config.data_dir
+    recording_path = current_app.configuration_manager.data_dir
     camera_id_dir = f"camera_{camera_id}"
     return os.path.abspath(os.path.join(recording_path, camera_id_dir, date, f"{time}.mp4"))
