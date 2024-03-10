@@ -71,40 +71,46 @@ class ConfigurationManager:
 
         self.cameras_config[camera_id] = camera_config
 
-    def update_from_config(self, config):
+    def update_from_config(self, default_config, camera_configs):
         # update the configuration from the configuration file
-        if 'Port' in config:
-            self.set_port(config['Port'])
-        if 'Host' in config:
-            self.set_host(config['Host'])
-        if 'DataDir' in config:
-            self.set_data_dir(config['DataDir'])
-        # if 'CameraID' in config:
-        #     self.set_camera_id(config['CameraID'])
-        if 'Debug' in config:
-            self.set_debug(config['Debug'] == 'True')
-        # if 'MaxErrors' in config:
-        #     self.set_max_errors(config['MaxErrors'])
-        if 'NoMonitor' in config:
-            self.no_monitor = config['NoMonitor'] == 'True'
-        # if 'Sensitivity' in config:
-        #     self.set_sensitivity(config['Sensitivity'])
+        if 'Port' in default_config:
+            self.set_port(default_config['Port'])
+        if 'Host' in default_config:
+            self.set_host(default_config['Host'])
+        if 'DataDir' in default_config:
+            self.set_data_dir(default_config['DataDir'])
+        if 'Debug' in default_config:
+            self.set_debug(default_config['Debug'] == 'True')
+        if 'NoMonitor' in default_config:
+            self.no_monitor = default_config['NoMonitor'] == 'True'
 
         # SMTP configuration
-        if 'smtpServer' in config:
+        if 'smtpServer' in default_config:
             self.smtp_server_config = {}
 
             smtp_params = ['smtpServer', 'smtpPort', 'smtpUser', 'smtpPassword', 'senderEmail']
             for param in smtp_params:
-                self.smtp_server_config[param] = config[param]    
+                self.smtp_server_config[param] = default_config[param]    
             
-            self.smtp_server_config['recipientEmails'] = config['recipientEmails'].split(',')
+            self.smtp_server_config['recipientEmails'] = default_config['recipientEmails'].split(',')
 
-        if 'twilioAccountSid' in config:
+        if 'twilioAccountSid' in default_config:
             self.twilio_config = {}
 
             twilio_params = ['twilioAccountSid', 'twilioAuthToken', 'twilioFromNumber']
             for param in twilio_params:
-                self.twilio_config[param] = config[param]
+                self.twilio_config[param] = default_config[param]
             
-            self.twilio_config['toNumbers'] = config['toNumbers'].split(',')
+            self.twilio_config['toNumbers'] = default_config['toNumbers'].split(',')
+
+        for camera_config_info in camera_configs:
+            camera_config = CameraConfig()
+            camera_config.set_camera_id(camera_config_info['CameraId'])
+
+            if 'MaxErrors' in camera_config_info:
+                camera_config.set_max_errors(camera_config_info['MaxErrors'])
+            
+            if 'Sensitivity' in camera_config_info:
+                camera_config.set_sensitivity(camera_config_info['Sensitivity'])
+
+            self.cameras_config[camera_config.camera_id] = camera_config

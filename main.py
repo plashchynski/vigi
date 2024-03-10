@@ -43,17 +43,21 @@ def read_config():
     Read the configuration file.
     """
     logging.info("Reading the configuration file... ")
-    config = configparser.ConfigParser()
-    config.read('vigi.ini')
-    user_config = config['DEFAULT']
+    ini = configparser.ConfigParser()
+    ini.read('vigi.ini')
+    default = ini['DEFAULT']
     logging.info("Configuration file read successfully.")
+    logging.debug(f"Default Configuration: {dict(default)}")
 
-    if user_config['Debug'] == 'True':
-        logging.getLogger().setLevel(logging.DEBUG)
+    camera_configs = []
+    for section in ini.sections():
+        # read the configuration from each camera
+        if section.startswith('CAMERA'):
+            camera_config = ini[section]
+            logging.debug(f"Camera configuration: {dict(camera_config)}")
+            camera_configs.append(camera_config)
 
-    logging.debug(f"Configuration: {dict(user_config)}")
-
-    return user_config
+    return default, camera_configs
 
 
 def init_logger(debug):
@@ -61,9 +65,9 @@ def init_logger(debug):
     Initialize the logger.
     """
     if debug:
-        logging.basicConfig(level=logging.DEBUG)
+        logging.getLogger().setLevel(logging.DEBUG)
     else:
-        logging.basicConfig(level=logging.INFO)
+        logging.getLogger().setLevel(logging.INFO)
 
 
 def init_notifier(configuration_manager):
@@ -105,8 +109,8 @@ def init_notifier(configuration_manager):
 app.configuration_manager = ConfigurationManager()
 
 # First, read the configuration file and update the configuration
-user_config = read_config()
-app.configuration_manager.update_from_config(user_config)
+default_config, camera_configs = read_config()
+app.configuration_manager.update_from_config(default_config, camera_configs)
 
 # Then, read the command line arguments and update the configuration
 # the command line arguments take precedence over the configuration file
