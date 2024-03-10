@@ -16,7 +16,7 @@
       <div class="accordion-item">
         <h2 class="accordion-header">
           <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ recording_date }}" aria-expanded="true" aria-controls="collapseOne">
-            {{ format_date(recording_date) }} ({{ recordings[recording_date] | length }} recordings)
+            {{ format_date(recording_date).capitalize() }} ({{ recordings[recording_date] | length }} recordings)
           </button>
         </h2>
         <div id="collapse{{ recording_date }}" class="accordion-collapse collapse recording_date_section" data-bs-parent="#accordion_recording_dates" data-date="{{ recording_date }}">
