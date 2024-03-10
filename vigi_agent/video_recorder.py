@@ -50,8 +50,7 @@ class VideoRecorder():
         logging.info(f"Recording video to: {self.recording_full_path}")
 
         # fourcc = cv2.VideoWriter_fourcc(*'mp4v') # MPEG-4 Part 2 (Simple Profile) codec, doesn't work in Chrome
-        # fourcc = cv2.VideoWriter_fourcc(*'X264') # H.264 codec is not available on Apple M1
-        fourcc = cv2.VideoWriter_fourcc(*'avc1')
+        fourcc = cv2.VideoWriter_fourcc(*'AVC1') # H.264 codec is not available on Apple M1, but 'AVC1' is the same as 'h264' and works in Chrome
         self.video_writer = cv2.VideoWriter(
             filename = self.recording_full_path,
             fourcc = fourcc,
