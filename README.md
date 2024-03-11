@@ -40,8 +40,8 @@ constant and does not change frequently.
 * Using command line arguments. This method is recommended for development and testing purposes:
 
 ```bash
-usage: main.py [-h] [--debug] [--no-monitor] [--data-dir DATA_DIR] [--camera-id CAMERA_ID] [--host HOST] [--port PORT]
-               [--max-errors MAX_ERRORS]
+usage: main.py [-h] [--debug] [--no-monitor] [--data-dir DATA_DIR] [--camera-id CAMERA_ID] [--host HOST] [--port PORT] [--max-errors MAX_ERRORS]
+               [--sensitivity SENSITIVITY]
 
 options:
   -h, --help            show this help message and exit
@@ -54,7 +54,26 @@ options:
   --port PORT           Port to run the web server
   --max-errors MAX_ERRORS
                         Maximum number of consecutive errors when reading a frame from the camera
+  --sensitivity SENSITIVITY
+                        Sensitivity of the motion detector, should be a float between 0 and 1
 ```
+
+You can configure additional cameras by adding a [CAMERAn] section to the `vigi.ini` file, where n is the camera ID. The only required parameter is the `CameraID`:
+
+```ini
+[CAMERA0]
+CameraID = 0
+
+[CAMERA1]
+CameraID = 1
+
+MaxErrors=50
+Sensitivity=0.5
+
+```
+
+You can specify `MaxErrors` and `Sensitivity` for each camera separately. If these parameters are not specified, the default values will be used.
+
 
 ## Installation on Raspberry Pi (Raspberry Pi OS)
 
@@ -132,4 +151,3 @@ To enable email notifications, you need to set up an SMTP server and get the fol
 * SMTP password
 
 You can use a Gmail SMTP server for this purpose. Set this configuration in the `vigi.ini` file.
-
