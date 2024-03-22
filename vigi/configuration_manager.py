@@ -17,7 +17,8 @@ class ConfigurationManager:
         self.no_monitor = False
         self.db_path = os.path.join(self.data_dir, 'vigi.db')
         self.cameras_config = {}
-        self.detection_model_file = './yolov8n.pt'
+        self.detection_model_file = os.path.join(user_data_dir('vigi-agent', 'Vigi'), 'yolov8n.pt')
+        self.disable_detection = False
 
     def set_port(self, port):
         # validate the port
@@ -43,6 +44,10 @@ class ConfigurationManager:
         # set the debug mode
         self.debug = debug
 
+    def set_disable_detection(self, disable_detection):
+        # set the disable detection mode
+        self.disable_detection = disable_detection
+
     def set_detection_model_file(self, detection_model_file):
         if not os.path.exists(detection_model_file):
             raise ValueError('Detection model file does not exist')
@@ -63,6 +68,8 @@ class ConfigurationManager:
             self.set_detection_model_file(cmd_args.detection_model_file)
         if cmd_args.no_monitor:
             self.no_monitor = True
+        if cmd_args.disable_detection:
+            self.set_disable_detection(True)
 
         # configure at leas one camera
         camera_id = 0
@@ -94,6 +101,8 @@ class ConfigurationManager:
             self.no_monitor = default_config['NoMonitor'] == 'True'
         if 'DetectionModelFile' in default_config:
             self.set_detection_model_file(default_config['DetectionModelFile'])
+        if 'DisableDetection' in default_config:
+            self.set_disable_detection(default_config['DisableDetection'] == 'True')
 
         # SMTP configuration
         if 'smtpServer' in default_config:

@@ -23,8 +23,6 @@ from vigi.database import Database
 
 DEFAULT_MODEL_URL = "https://github.com/ultralytics/assets/releases/download/v8.1.0/yolov8n.pt"
 
-
-
 def read_args():
     """
     read the command line arguments
@@ -39,6 +37,7 @@ def read_args():
     parser.add_argument("--max-errors", help="Maximum number of consecutive errors when reading a frame from the camera", type=int)
     parser.add_argument("--sensitivity", help="Sensitivity of the motion detector, should be a float between 0 and 1", type=float)
     parser.add_argument("--detection-model-file", help="Path to the detection model file (YOLO's yolov8n.pt, by default)", type=str)
+    parser.add_argument("--disable-detection", help="Disable object detection", action='store_true')
     args = parser.parse_args()
     return args
 
@@ -107,6 +106,26 @@ def init_notifier(configuration_manager):
     logging.info("Notifier initialized successfully.")
     return notifier
 
+def ensure_model_file() -> str:
+    """
+    Ensure that the detection model file exists by downloading it if it does not exist.
+    return: str, the path to the detection model file
+    """
+    if app.configuration_manager.disable_detection:
+        # we don't need the detection model file if the detection is disabled
+        return None
+    
+    # check if the detection model file exists
+    if os.path.exists(app.configuration_manager.detection_model_file):
+        logging.info(f"Use detection model file: {app.configuration_manager.detection_model_file}")
+    else:
+        logging.info(f"Detection model file does not exist: {app.configuration_manager.detection_model_file}")
+        # download the detection model file
+        logging.info("Downloading the detection model file... ")
+        urllib.request.urlretrieve(DEFAULT_MODEL_URL, app.configuration_manager.detection_model_file)
+        logging.info("Detection model file downloaded successfully.")
+
+    return app.configuration_manager.detection_model_file
 
 def main():
     # Initialize the configuration with the default values
@@ -121,20 +140,15 @@ def main():
     args = read_args()
     app.configuration_manager.update_from_args(args)
 
-    # check if the detection model file exists
-    if not os.path.exists(app.configuration_manager.detection_model_file):
-        logging.info(f"Detection model file does not exist: {app.configuration_manager.detection_model_file}")
-        # download the detection model file
-        logging.info("Downloading the detection model file... ")
-        urllib.request.urlretrieve(DEFAULT_MODEL_URL, app.configuration_manager.detection_model_file)
-        logging.info("Detection model file downloaded successfully.")
+    init_logger(app.configuration_manager.debug)
+
+    # Check if the detection model file exists, download it if it does not exist
+    object_detection_model = ensure_model_file()
 
     # create data dir if it does not exist
     if not os.path.exists(app.configuration_manager.data_dir):
         logging.info(f"Data directory does not exist, creating: {app.configuration_manager.data_dir}")
         os.makedirs(app.configuration_manager.data_dir)
-
-    init_logger(app.configuration_manager.debug)
 
     notifier = init_notifier(app.configuration_manager)
 
@@ -170,8 +184,8 @@ def main():
                 max_errors = camera_config.max_errors,
                 notifier = notifier,
                 db_path = app.configuration_manager.db_path,
-                sensitivity=camera_config.sensitivity,
-                debug=app.configuration_manager.debug
+                sensitivity = camera_config.sensitivity,
+                object_detection_model = object_detection_model
             )
             camera_monitor.start()
             app.camera_monitors[camera_id] = camera_monitor

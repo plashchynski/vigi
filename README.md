@@ -29,8 +29,8 @@ constant and does not change frequently.
 * Using command line arguments. This method is recommended for development and testing purposes:
 
 ```txt
-usage: vigi [-h] [--debug] [--no-monitor] [--data-dir DATA_DIR] [--camera-id CAMERA_ID] [--host HOST] [--port PORT] [--max-errors MAX_ERRORS] [--sensitivity SENSITIVITY]
-            [--detection-model-file DETECTION_MODEL_FILE]
+usage: vigi [-h] [--debug] [--no-monitor] [--data-dir DATA_DIR] [--camera-id CAMERA_ID] [--host HOST] [--port PORT] [--max-errors MAX_ERRORS]
+               [--sensitivity SENSITIVITY] [--detection-model-file DETECTION_MODEL_FILE] [--disable-detection]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -47,6 +47,7 @@ optional arguments:
                         Sensitivity of the motion detector, should be a float between 0 and 1
   --detection-model-file DETECTION_MODEL_FILE
                         Path to the detection model file (YOLO's yolov8n.pt, by default)
+  --disable-detection   Disable object detection
 ```
 
 You can configure additional cameras by adding a [CAMERAn] section to the `vigi.ini` file, where n is the camera ID. The only required parameter is the `CameraID`:

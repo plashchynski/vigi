@@ -30,7 +30,7 @@ class FileProcessor:
     def process(self):
         cap = cv2.VideoCapture(self.file_path)
 
-        motion_detector = MotionDetector(self.motion_callback)
+        motion_detector = MotionDetector(self.motion_callback, model_file='yolov8n.pt')
 
         while True:
             # read frames from the sample video

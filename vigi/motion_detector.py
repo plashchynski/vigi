@@ -6,7 +6,7 @@ from vigi.utils.spatial import boxes_intersect
 from vigi.utils.drawing import draw_bboxes, draw_bbox, draw_title
 
 class MotionDetector():
-    def __init__(self, motion_callback, debug=False, sensitivity=0.5):
+    def __init__(self, motion_callback, object_detection_model=None, debug=False, sensitivity=0.5):
         """
         Initialize the motion detector with the given sensitivity and motion callback.
         The motion callback is called when motion is detected.
@@ -21,7 +21,10 @@ class MotionDetector():
         self.motion_detected = False
         self.debug = debug
         self.skip_frames_count = 50 # warming up frames count
-        self.yolo = YOLO('yolov8n.pt')
+        self.yolo = None
+
+        if object_detection_model:
+            self.yolo = YOLO(object_detection_model)
 
     def is_motion_detected(self) -> bool:
         """
@@ -103,20 +106,21 @@ class MotionDetector():
 
         detected_objects = set()
         if self.motion_detected:
-            results = self.yolo(original_frame, verbose=False)
+            if self.yolo:
+                results = self.yolo(original_frame, verbose=False)
 
-            for result in results:
-                for box, cls in zip(result.boxes.xyxy, result.boxes.cls):
-                    label = result.names[int(cls)]
-                    detected_objects.update([label])
-                    display = False
+                for result in results:
+                    for box, cls in zip(result.boxes.xyxy, result.boxes.cls):
+                        label = result.names[int(cls)]
+                        detected_objects.update([label])
+                        display = False
 
-                    # check if this box intersects with any of the detections
-                    for detection in detections:
-                        if boxes_intersect(box, detection):
-                            display = True
+                        # check if this box intersects with any of the detections
+                        for detection in detections:
+                            if boxes_intersect(box, detection):
+                                display = True
 
-                    if display:
-                        draw_bbox(original_frame, box, label=label)
+                        if display:
+                            draw_bbox(original_frame, box, label=label)
 
         return (original_frame, detected_objects)
