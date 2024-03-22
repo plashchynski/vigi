@@ -1,0 +1,45 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "vigi/__init__.py"
+
+[project]
+name = "vigi"
+dynamic = ["version"]
+authors = [
+  { name = "Dzmitry Plashchynski", email = "plashchynski@gmail.com" },
+]
+maintainers = [
+  { name = "Dzmitry Plashchynski", email = "plashchynski@gmail.com" },
+]
+description = "Camera surveillance system with motion detection and object recognition for home security."
+readme = "README.md"
+keywords = ["camera", "surveillance", "motion detection", "object recognition", "home security"]
+
+requires-python = ">=3.8"
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+]
+dependencies = [
+  "opencv-python ~= 4.9.0.80",
+  "flask ~= 3.0.0",
+  "bootstrap-flask ~= 2.3.3",
+  "flask-caching ~= 2.1.0",
+  "ultralytics ~= 8.1.14",
+  "humanize ~= 4.9.0",
+  "twilio ~= 9.0.0",
+  "platformdirs ~= 4.2.0",
+]
+
+[project.scripts]
+vigi = "vigi.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/plashchynski/vigi"
+Repository = "https://github.com/plashchynski/vigi.git"
+Issues = "https://github.com/plashchynski/vigi/issues"

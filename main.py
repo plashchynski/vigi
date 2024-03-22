@@ -1,3 +1,3 @@
-from vigi_agent.cli import main
+from vigi.cli import main
 
 main()

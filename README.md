@@ -100,12 +100,18 @@ wget https://github.com/ultralytics/assets/releases/download/v8.1.0/yolov8n.pt
 python main.py
 ```
 
-## Debugging Flask app
-
-If you want to run the Flask app in debug mode without the camera monitor, you can do so by running the following command:
+## Build a pip package
 
 ```bash
-python main.py --debug --no-monitor
+pip install build
+python -m build
+```
+
+## Publish the package to PyPI
+
+```bash
+python -m pip install --upgrade twine
+python -m twine upload dist/*
 ```
 
 ## Run unit tests
