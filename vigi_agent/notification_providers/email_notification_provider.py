@@ -7,7 +7,7 @@ from email.mime.multipart import MIMEMultipart
 
 class EmailNotificationProvider:
     def __init__(self, smtp_server: str, smtp_port: int, smtp_user: str, smtp_password: str, sender_email: str,
-                 recipient_emails: list[str]):
+                 recipient_emails: list):
         """
         :param smtp_server: SMTP server address
         :param smtp_port: SMTP server port

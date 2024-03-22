@@ -5,7 +5,7 @@ from twilio.rest import Client
 
 class SMSNotificationProvider:
     def __init__(self, account_sid: str, auth_token: str, from_number: str,
-                 recipient_phone_numbers: list[str]):
+                 recipient_phone_numbers: list):
         """
         :param account_sid: Twilio account SID
         :param auth_token: Twilio auth token

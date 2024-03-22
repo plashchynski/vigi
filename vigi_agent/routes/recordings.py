@@ -96,7 +96,10 @@ def index():
         for file in glob(os.path.join(recording_path, "**", recording_date, "*.mp4")):
             camera_id = Path(file).parent.parent.name.split("_")[1]
             time = Path(file).stem
-            duration = read_video_file_meta(file).get("duration")
+            meta = read_video_file_meta(file)
+            duration = 0
+            if meta:
+                duration = meta.get("duration")
 
             recording_info = {
                 "time": time,

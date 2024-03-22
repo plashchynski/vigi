@@ -10,7 +10,7 @@
 
 ## Requirements
 
-- Python 3.12
+- Python 3.8 or higher. Tested with Python 3.12
 - OpenCV
 - Camera (webcam or IP camera) that can be accessed via OpenCV
 - A server hardware (Raspberry Pi, PC, etc.) to run the agent
@@ -19,7 +19,7 @@
 
 ```bash
 # Set up a virtual environment
-python3.12 -m venv .venv
+python -m venv .venv
 . .venv/bin/activate
 
 # Install the required packages
