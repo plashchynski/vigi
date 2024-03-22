@@ -34,6 +34,7 @@ def read_args():
     parser.add_argument("--port", help="Port to run the web server", type=int)
     parser.add_argument("--max-errors", help="Maximum number of consecutive errors when reading a frame from the camera", type=int)
     parser.add_argument("--sensitivity", help="Sensitivity of the motion detector, should be a float between 0 and 1", type=float)
+    parser.add_argument("--detection-model-file", help="Path to the detection model file (YOLO's yolov8n.pt, by default)", type=str)
     args = parser.parse_args()
     return args
 
