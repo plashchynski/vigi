@@ -16,13 +16,25 @@ recordings_blueprint = Blueprint('recordings', __name__)
 def preview(camera_id, date, time):
     video_path = _video_file_path(camera_id, date, time)
 
-    # TODO: Check if video_path exists
-    jpg = generate_preview(video_path)
+    if not os.path.exists(video_path):
+        return "Video not found", 404
 
-    if jpg is None:
-        return(redirect(url_for('static', filename='no_preview_available.jpg')))
+    # get the path without the file extension
+    video_preview_path = os.path.splitext(video_path)[0] + ".jpg"
 
-    return jpg, 200, {'Content-Type': 'image/jpeg'}
+    # check if a cached preview exists
+    if os.path.exists(video_preview_path):
+        # return the cached preview
+        with open(video_preview_path, "rb") as f:
+            return f.read(), 200, {'Content-Type': 'image/jpeg'}
+    else:
+        # generate a new preview
+        jpg = generate_preview(video_path)
+
+        if jpg is None:
+            return(redirect(url_for('static', filename='no_preview_available.jpg')))
+
+        return jpg, 200, {'Content-Type': 'image/jpeg'}
 
 
 @recordings_blueprint.route('/recordings/<camera_id>/<date>/<time>/video')

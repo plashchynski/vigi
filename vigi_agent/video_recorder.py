@@ -6,6 +6,8 @@ import shutil
 
 import cv2
 
+from vigi_agent.utils.media import generate_preview
+
 DEFAULT_FPS = 25
 DEFAULT_FRAME_WIDTH = 640
 DEFAULT_FRAME_HEIGHT = 480
@@ -92,6 +94,13 @@ class VideoRecorder():
         logging.info(f"Moving the recording from {self.recording_full_path} to {complete_recording_path}")
         # move the recording from the temporary directory to the date directory
         shutil.move(self.recording_full_path, complete_recording_path)
+
+        # generate a preview image for the recording
+        jpg = generate_preview(complete_recording_path)
+        preview_path = os.path.join(date_path, f"{self.recording_start_time}.jpg")
+        logging.info(f"Saving preview image to: {preview_path}")
+        with open(preview_path, "wb") as f:
+            f.write(jpg)
 
 
     def is_recording(self) -> bool:
