@@ -7,7 +7,7 @@ import cv2
 
 from .motion_detector import MotionDetector
 
-from vigi_agent.utils.fps_calculator import FPSCalculator
+from vigi.utils.fps_calculator import FPSCalculator
 from .utils.pub_sub import PubSub
 from .database import Database
 

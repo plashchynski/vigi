@@ -1,7 +1,7 @@
 import unittest
 import time
 
-from vigi_agent.utils.fps_calculator import FPSCalculator
+from vigi.utils.fps_calculator import FPSCalculator
 
 class TestFpsCalculator(unittest.TestCase):
     def test_fps_calculator(self):

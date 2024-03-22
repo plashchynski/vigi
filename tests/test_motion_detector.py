@@ -12,7 +12,7 @@ import os
 from glob import glob
 import unittest
 
-from vigi_agent.motion_detector import MotionDetector
+from vigi.motion_detector import MotionDetector
 
 
 class FileProcessor:

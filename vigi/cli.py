@@ -8,17 +8,17 @@ import logging
 import configparser
 import atexit
 
-from vigi_agent.configuration_manager import ConfigurationManager
+from vigi.configuration_manager import ConfigurationManager
 
-from vigi_agent.notification_providers.email_notification_provider import EmailNotificationProvider
-from vigi_agent.notification_providers.sms_notification_provider import SMSNotificationProvider
-from vigi_agent.notifier import Notifier
+from vigi.notification_providers.email_notification_provider import EmailNotificationProvider
+from vigi.notification_providers.sms_notification_provider import SMSNotificationProvider
+from vigi.notifier import Notifier
 
-from vigi_agent.app import app
-from vigi_agent.video_recorder import VideoRecorder
-from vigi_agent.camera_monitor import CameraMonitor
+from vigi.app import app
+from vigi.video_recorder import VideoRecorder
+from vigi.camera_monitor import CameraMonitor
 
-from vigi_agent.database import Database
+from vigi.database import Database
 
 
 def read_args():

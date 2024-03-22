@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 
-from vigi_agent.notification_providers.email_notification_provider import EmailNotificationProvider
+from vigi.notification_providers.email_notification_provider import EmailNotificationProvider
 
 # # to have a wild test, please provide your own email credentials
 # # and uncomment the following lines:
@@ -19,7 +19,7 @@ from vigi_agent.notification_providers.email_notification_provider import EmailN
 #         provider.notify("Test notification")
 
 class TestEmailNotificationProvider(unittest.TestCase):
-     @patch('vigi_agent.notification_providers.email_notification_provider.smtplib.SMTP')
+     @patch('vigi.notification_providers.email_notification_provider.smtplib.SMTP')
      def test_notify(self, mock_smtp):
         provider = EmailNotificationProvider(
             smtp_server = "smtp.gmail.com",

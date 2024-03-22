@@ -1,7 +1,7 @@
 import unittest
 import queue
 
-from vigi_agent.utils.pub_sub import PubSub
+from vigi.utils.pub_sub import PubSub
 
 class TestPubSub(unittest.TestCase):
     def test_single_subscription(self):

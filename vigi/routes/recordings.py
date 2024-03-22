@@ -4,10 +4,10 @@ from pathlib import Path
 from glob import glob
 
 from flask import Blueprint, redirect, url_for, render_template, current_app, send_file, request
-from vigi_agent.utils.media import generate_preview, read_video_file_meta
+from vigi.utils.media import generate_preview, read_video_file_meta
 
-from vigi_agent.cache import cache
-from vigi_agent.database import Database
+from vigi.cache import cache
+from vigi.database import Database
 
 recordings_blueprint = Blueprint('recordings', __name__)
 

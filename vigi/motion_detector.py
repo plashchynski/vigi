@@ -2,8 +2,8 @@ import cv2
 import numpy as np
 from ultralytics import YOLO
 
-from vigi_agent.utils.spatial import boxes_intersect
-from vigi_agent.utils.drawing import draw_bboxes, draw_bbox, draw_title
+from vigi.utils.spatial import boxes_intersect
+from vigi.utils.drawing import draw_bboxes, draw_bbox, draw_title
 
 class MotionDetector():
     def __init__(self, motion_callback, debug=False, sensitivity=0.5):

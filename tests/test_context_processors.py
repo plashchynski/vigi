@@ -1,6 +1,6 @@
 import unittest
 
-from vigi_agent.context_processors import utility_processor
+from vigi.context_processors import utility_processor
 
 class TestUtilityProcessor(unittest.TestCase):
     def setUp(self):

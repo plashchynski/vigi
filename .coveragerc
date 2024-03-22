@@ -1,8 +1,8 @@
 [run]
 include = ./main.py
-          vigi_agent/**/*.py
+          vigi/**/*.py
 
 [report]
 include = ./main.py
-          vigi_agent/**/*.py
+          vigi/**/*.py
 include_namespace_packages = True

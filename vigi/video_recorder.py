@@ -6,7 +6,7 @@ import shutil
 
 import cv2
 
-from vigi_agent.utils.media import generate_preview
+from vigi.utils.media import generate_preview
 
 DEFAULT_FPS = 25
 DEFAULT_FRAME_WIDTH = 640

@@ -1,5 +1,5 @@
 import unittest
-from vigi_agent.utils.media import read_video_file_meta, generate_preview
+from vigi.utils.media import read_video_file_meta, generate_preview
 
 class MediaTestCase(unittest.TestCase):
     def test_read_video_file_meta(self):

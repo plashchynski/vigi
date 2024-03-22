@@ -1,9 +1,9 @@
 import unittest
 from unittest.mock import patch, MagicMock
-from vigi_agent.notification_providers.sms_notification_provider import SMSNotificationProvider
+from vigi.notification_providers.sms_notification_provider import SMSNotificationProvider
 
 class TestSMSNotificationProvider(unittest.TestCase):
-    @patch('vigi_agent.notification_providers.sms_notification_provider.Client')
+    @patch('vigi.notification_providers.sms_notification_provider.Client')
     def test_notify(self, mock_client):
         # Initialize the mocked Twilio client
         mock_client_instance = MagicMock()
