@@ -51,6 +51,8 @@ def generate_preview(video_path):
     
     cap.release()
 
+    frame = cv2.resize(frame, (int(frame.shape[1] / 4), int(frame.shape[0] / 4)))
+
     # convert the frame to JPEG and return it
     _, frame = cv2.imencode('.jpg', frame)
 
