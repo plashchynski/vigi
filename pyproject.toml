@@ -26,14 +26,14 @@ classifiers = [
   "Operating System :: OS Independent",
 ]
 dependencies = [
-  "opencv-python ~= 4.9.0.80",
-  "flask ~= 3.0.0",
-  "bootstrap-flask ~= 2.3.3",
-  "flask-caching ~= 2.1.0",
-  "ultralytics ~= 8.1.14",
-  "humanize ~= 4.9.0",
-  "twilio ~= 9.0.0",
-  "platformdirs ~= 4.2.0",
+  "opencv-python == 4.9.0.80",
+  "flask == 3.0.2",
+  "bootstrap-flask == 2.3.3",
+  "flask-caching == 2.1.0",
+  "ultralytics == 8.1.30",
+  "humanize == 4.9.0",
+  "twilio == 9.0.2",
+  "platformdirs == 4.2.0",
 ]
 
 [project.scripts]
@@ -43,3 +43,4 @@ vigi = "vigi.cli:main"
 Homepage = "https://github.com/plashchynski/vigi"
 Repository = "https://github.com/plashchynski/vigi.git"
 Issues = "https://github.com/plashchynski/vigi/issues"
+Changelog = "https://github.com/plashchynski/vigi/blob/main/CHANGELOG.md"

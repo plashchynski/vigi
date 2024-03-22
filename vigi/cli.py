@@ -7,6 +7,7 @@ import argparse
 import logging
 import configparser
 import atexit
+import urllib.request
 
 from vigi.configuration_manager import ConfigurationManager
 
@@ -19,6 +20,9 @@ from vigi.video_recorder import VideoRecorder
 from vigi.camera_monitor import CameraMonitor
 
 from vigi.database import Database
+
+DEFAULT_MODEL_URL = "https://github.com/ultralytics/assets/releases/download/v8.1.0/yolov8n.pt"
+
 
 
 def read_args():
@@ -116,6 +120,14 @@ def main():
     # the command line arguments take precedence over the configuration file
     args = read_args()
     app.configuration_manager.update_from_args(args)
+
+    # check if the detection model file exists
+    if not os.path.exists(app.configuration_manager.detection_model_file):
+        logging.info(f"Detection model file does not exist: {app.configuration_manager.detection_model_file}")
+        # download the detection model file
+        logging.info("Downloading the detection model file... ")
+        urllib.request.urlretrieve(DEFAULT_MODEL_URL, app.configuration_manager.detection_model_file)
+        logging.info("Detection model file downloaded successfully.")
 
     # create data dir if it does not exist
     if not os.path.exists(app.configuration_manager.data_dir):

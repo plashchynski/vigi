@@ -2,9 +2,9 @@
 
 ## Features
 
+* Multiple camera support
 * Motion detection
 * Object recognition
-* Multiple camera support
 * Web server to view the camera feed and recordings
 * Notifications via SMS and email
 
@@ -12,24 +12,13 @@
 
 - Python 3.8 or higher. Tested with Python 3.12
 - OpenCV
-- Camera (webcam or IP camera) that can be accessed via OpenCV
-- A server hardware (Raspberry Pi, PC, etc.) to run the agent
+- A USB camera that can be accessed via OpenCV
 
-## Run from the sources
+## Installation and usage
 
 ```bash
-# Set up a virtual environment
-python -m venv .venv
-. .venv/bin/activate
-
-# Install the required packages
-pip install -r requirements.txt
-
-# Download a YOLOv8 nano model:
-wget https://github.com/ultralytics/assets/releases/download/v8.1.0/yolov8n.pt
-
-# run the agent
-python main.py
+pip install vigi
+vigi
 ```
 
 ## Configuration
@@ -39,11 +28,11 @@ The agent can be configured in two ways:
 constant and does not change frequently.
 * Using command line arguments. This method is recommended for development and testing purposes:
 
-```bash
-usage: main.py [-h] [--debug] [--no-monitor] [--data-dir DATA_DIR] [--camera-id CAMERA_ID] [--host HOST] [--port PORT] [--max-errors MAX_ERRORS]
-               [--sensitivity SENSITIVITY]
+```txt
+usage: vigi [-h] [--debug] [--no-monitor] [--data-dir DATA_DIR] [--camera-id CAMERA_ID] [--host HOST] [--port PORT] [--max-errors MAX_ERRORS] [--sensitivity SENSITIVITY]
+            [--detection-model-file DETECTION_MODEL_FILE]
 
-options:
+optional arguments:
   -h, --help            show this help message and exit
   --debug               Enable debug mode
   --no-monitor          Disable the camera monitor
@@ -56,6 +45,8 @@ options:
                         Maximum number of consecutive errors when reading a frame from the camera
   --sensitivity SENSITIVITY
                         Sensitivity of the motion detector, should be a float between 0 and 1
+  --detection-model-file DETECTION_MODEL_FILE
+                        Path to the detection model file (YOLO's yolov8n.pt, by default)
 ```
 
 You can configure additional cameras by adding a [CAMERAn] section to the `vigi.ini` file, where n is the camera ID. The only required parameter is the `CameraID`:
@@ -77,20 +68,28 @@ You can specify `MaxErrors` and `Sensitivity` for each camera separately. If the
 
 ## Installation on Raspberry Pi (Raspberry Pi OS)
 
+64 bit OS is required for PyTorch to work. Tested with [Raspberry Pi OS (Legacy, 64-bit)](https://www.raspberrypi.com/software/operating-systems/#raspberry-pi-os-legacy-64-bit).
+
+Install the pip package:
 ```bash
-curl https://pyenv.run | bash # install pyenv
+pip install vigi
+```
 
-# initialize pyenv:
-export PYENV_ROOT="$HOME/.pyenv"
-[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
+Run the agent:
+```bash
+./.local/bin/vigi --host 0.0.0.0
+```
 
-pyenv install 3.12.2 # install Python 3.12
-pyenv virtualenv 3.12.2 vigi # create a virtual environment
-pyenv activate vigi # activate the virtual environment
+# Development
 
-# install the required packages
+## Run from the sources
+
+```bash
+# Set up a virtual environment
+python -m venv .venv
+. .venv/bin/activate
+
+# Install the required packages
 pip install -r requirements.txt
 
 # Download a YOLOv8 nano model:
