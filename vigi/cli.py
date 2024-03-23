@@ -26,6 +26,7 @@ from vigi.database import Database
 
 DEFAULT_MODEL_URL = "https://github.com/ultralytics/assets/releases/download/v8.1.0/yolov8n.pt"
 
+
 def read_args():
     """
     read the command line arguments
@@ -110,6 +111,7 @@ def init_notifier(configuration_manager):
     logging.info("Notifier initialized successfully.")
     return notifier
 
+
 def ensure_model_file() -> str:
     """
     Ensure that the detection model file exists by downloading it if it does not exist.
@@ -130,6 +132,17 @@ def ensure_model_file() -> str:
         logging.info("Detection model file downloaded successfully.")
 
     return app.configuration_manager.detection_model_file
+
+def graceful_exit():
+    """
+    This function is called when the application exits by Ctrl+C or by any other reason.
+    It sends signals to the camera monitors to stop and waits for them to finish recording.
+    """
+    logging.info("Exiting the application... ")
+    if hasattr(app, 'camera_monitors'):
+        for camera_monitor in app.camera_monitors.values():
+            camera_monitor.stop()
+    logging.info("Application exited successfully.")
 
 def main():
     # Initialize the configuration with the default values
@@ -164,12 +177,12 @@ def main():
     # close the database connection after initializing the database 
     # as it's not used in the main thread
     database.close()
-
     logging.info("Database initialized successfully.")
 
     if app.configuration_manager.no_monitor:
         logging.info("Camera monitor is disabled.")
     else:
+        # this dictionary will hold the camera monitors for each camera
         app.camera_monitors = {}
 
         for camera_id, camera_config in app.configuration_manager.cameras_config.items():
@@ -206,15 +219,10 @@ def main():
             app.camera_monitors[camera_id] = camera_monitor
             logging.info(f"Camera monitor for camera {camera_id} started successfully.")
 
-    def graceful_exit():
-        logging.info("Exiting the application... ")
-        if hasattr(app, 'camera_monitors'):
-            for camera_monitor in app.camera_monitors.values():
-                camera_monitor.stop()
-        logging.info("Application exited successfully.")
-
+    # register the graceful_exit function to be called when the application exits
     atexit.register(graceful_exit)
 
+    # Now we start the Flask web server to serve the web console
     logging.info("Starting the Flask web server... ")
     flask_debug = False
     if app.configuration_manager.debug and app.configuration_manager.no_monitor:

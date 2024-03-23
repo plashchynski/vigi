@@ -37,8 +37,10 @@ class CameraMonitor(threading.Thread):
         # so other parts of the application can access the stream of frames
         self.frame_stream = PubSub()
 
-        # Initialize the motion detector, when motion is detected, the motion_callback will be called
         self.motion_detector = motion_detector
+
+        # when motion is detected, the motion_callback will be called
+        self.motion_detector.set_motion_callback(self.motion_callback)
 
         # video_recorder is used to save the video to a file when motion is detected
         self.video_recorder = video_recorder
