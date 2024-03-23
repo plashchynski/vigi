@@ -5,8 +5,6 @@ import logging
 
 import cv2
 
-from .motion_detector import MotionDetector
-
 from vigi.utils.fps_calculator import FPSCalculator
 from .utils.pub_sub import PubSub
 from .database import Database
@@ -18,7 +16,7 @@ class CameraMonitor(threading.Thread):
     """
 
     def __init__(self, video_recorder = None, camera_id=0, max_errors=50, add_seconds_after_motion=10,
-                 notifier=None, db_path=None, sensitivity=0.5, object_detection_model=None):
+                 notifier=None, db_path=None, motion_detector=None):
         """
         max_errors: int - the maximum number of consecutive errors when reading a frame from the camera
                             before the camera monitor stops. It's used to prevent the camera monitor from
@@ -40,11 +38,7 @@ class CameraMonitor(threading.Thread):
         self.frame_stream = PubSub()
 
         # Initialize the motion detector, when motion is detected, the motion_callback will be called
-        self.motion_detector = MotionDetector(
-                motion_callback = self.motion_callback,
-                object_detection_model = object_detection_model,
-                sensitivity = sensitivity
-            )
+        self.motion_detector = motion_detector
 
         # video_recorder is used to save the video to a file when motion is detected
         self.video_recorder = video_recorder

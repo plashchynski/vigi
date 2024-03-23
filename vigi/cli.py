@@ -9,6 +9,8 @@ import configparser
 import atexit
 import urllib.request
 
+from ultralytics import YOLO
+
 from vigi.configuration_manager import ConfigurationManager
 
 from vigi.notification_providers.email_notification_provider import EmailNotificationProvider
@@ -18,6 +20,7 @@ from vigi.notifier import Notifier
 from vigi.app import app
 from vigi.video_recorder import VideoRecorder
 from vigi.camera_monitor import CameraMonitor
+from vigi.motion_detector import MotionDetector
 
 from vigi.database import Database
 
@@ -38,6 +41,7 @@ def read_args():
     parser.add_argument("--sensitivity", help="Sensitivity of the motion detector, should be a float between 0 and 1", type=float)
     parser.add_argument("--detection-model-file", help="Path to the detection model file (YOLO's yolov8n.pt, by default)", type=str)
     parser.add_argument("--disable-detection", help="Disable object detection", action='store_true')
+    parser.add_argument("--inference-device", help="Inference device for object detection (cpu or cuda)", type=str)
     args = parser.parse_args()
     return args
 
@@ -143,7 +147,7 @@ def main():
     init_logger(app.configuration_manager.debug)
 
     # Check if the detection model file exists, download it if it does not exist
-    object_detection_model = ensure_model_file()
+    object_detection_model_path = ensure_model_file()
 
     # create data dir if it does not exist
     if not os.path.exists(app.configuration_manager.data_dir):
@@ -176,6 +180,18 @@ def main():
             )
             logging.info("Video recorder initialized successfully.")
 
+            object_detection_model = None
+            if object_detection_model_path:
+                logging.info(f"Initializing the object detection model with YOLO weights {object_detection_model_path} on device {app.configuration_manager.inference_device}... ")
+                object_detection_model = YOLO(object_detection_model_path)
+
+            # create a motion detector for each camera
+            motion_detector = MotionDetector(
+                object_detection_model = object_detection_model,
+                sensitivity = camera_config.sensitivity,
+                inference_device = app.configuration_manager.inference_device
+            )
+
             # create a camera monitor for each camera
             logging.info(f"Starting the camera monitor for camera {camera_id}... ")
             camera_monitor = CameraMonitor(
@@ -184,8 +200,7 @@ def main():
                 max_errors = camera_config.max_errors,
                 notifier = notifier,
                 db_path = app.configuration_manager.db_path,
-                sensitivity = camera_config.sensitivity,
-                object_detection_model = object_detection_model
+                motion_detector = motion_detector
             )
             camera_monitor.start()
             app.camera_monitors[camera_id] = camera_monitor

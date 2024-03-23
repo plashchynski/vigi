@@ -1,12 +1,11 @@
 import cv2
 import numpy as np
-from ultralytics import YOLO
 
 from vigi.utils.spatial import boxes_intersect
 from vigi.utils.drawing import draw_bboxes, draw_bbox, draw_title
 
 class MotionDetector():
-    def __init__(self, motion_callback, object_detection_model=None, debug=False, sensitivity=0.5):
+    def __init__(self, object_detection_model=None, inference_device=None, debug=False, sensitivity=0.5):
         """
         Initialize the motion detector with the given sensitivity and motion callback.
         The motion callback is called when motion is detected.
@@ -17,14 +16,18 @@ class MotionDetector():
             varThreshold=(50 / self.sensitivity), # the higher the sensitivity, the lower the threshold
             detectShadows=True
         )
-        self.motion_callback = motion_callback
+        self.motion_callback = None
         self.motion_detected = False
         self.debug = debug
         self.skip_frames_count = 50 # warming up frames count
-        self.yolo = None
-
-        if object_detection_model:
-            self.yolo = YOLO(object_detection_model)
+        self.object_detection_model = object_detection_model
+        self.inference_device = inference_device
+    
+    def set_motion_callback(self, motion_callback):
+        """
+        Set the motion callback that will be called when motion is detected.
+        """
+        self.motion_callback = motion_callback
 
     def is_motion_detected(self) -> bool:
         """
@@ -85,7 +88,8 @@ class MotionDetector():
             # Motion detected!
             if self.motion_detected == False:
                 self.motion_detected = True
-                self.motion_callback()
+                if self.motion_callback:
+                    self.motion_callback()
 
             self.reset_motion_flag_after = 2 # frames
 
@@ -106,10 +110,13 @@ class MotionDetector():
 
         detected_objects = set()
         if self.motion_detected:
-            if self.yolo:
-                results = self.yolo(original_frame, verbose=False)
+            if self.object_detection_model:
+                results = self.object_detection_model(original_frame, device=self.inference_device, verbose=False)
 
                 for result in results:
+                    # move to cpu
+                    result = result.cpu()
+
                     for box, cls in zip(result.boxes.xyxy, result.boxes.cls):
                         label = result.names[int(cls)]
                         detected_objects.update([label])

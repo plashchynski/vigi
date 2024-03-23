@@ -1,6 +1,8 @@
 # this class is used to validate and store the configuration of the agent
 import os
 
+import torch
+
 from platformdirs import user_data_dir
 
 from .camera_config import CameraConfig
@@ -19,6 +21,16 @@ class ConfigurationManager:
         self.cameras_config = {}
         self.detection_model_file = os.path.join(user_data_dir('vigi-agent', 'Vigi'), 'yolov8n.pt')
         self.disable_detection = False
+        self.inference_device = 'cpu'
+
+        # detect if cuda is available
+        if torch.cuda.is_available():
+            self.set_inference_device('cuda')
+
+        # detect if mps is available (Apple ARM chips)
+        elif torch.backends.mps.is_available():
+            self.set_inference_device('mps')
+        
 
     def set_port(self, port):
         # validate the port
@@ -70,6 +82,8 @@ class ConfigurationManager:
             self.no_monitor = True
         if cmd_args.disable_detection:
             self.set_disable_detection(True)
+        if cmd_args.inference_device:
+            self.set_inference_device(cmd_args.inference_device)
 
         # configure at leas one camera
         camera_id = 0
@@ -87,6 +101,16 @@ class ConfigurationManager:
 
         self.cameras_config[camera_id] = camera_config
 
+    def set_inference_device(self, inference_device):
+        # check if device is exist
+        try:
+            torch.device(inference_device)
+        except:
+            raise ValueError('Inference device is not valid')
+
+        # set the inference device
+        self.inference_device = inference_device
+
     def update_from_config(self, default_config, camera_configs):
         # update the configuration from the configuration file
         if 'Port' in default_config:
@@ -103,6 +127,8 @@ class ConfigurationManager:
             self.set_detection_model_file(default_config['DetectionModelFile'])
         if 'DisableDetection' in default_config:
             self.set_disable_detection(default_config['DisableDetection'] == 'True')
+        if 'InferenceDevice' in default_config:
+            self.set_inference_device(default_config['InferenceDevice'])
 
         # SMTP configuration
         if 'smtpServer' in default_config:
