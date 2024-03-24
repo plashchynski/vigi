@@ -23,6 +23,8 @@ vigi
 
 ## Configuration
 
+A detailed configuration options are available in the [Configuration](docs/configuration.md) document.
+
 The agent can be configured in two ways:
 * Using the `vigi.ini` file. This method is recommended for production use and when configuration is
 constant and does not change frequently.

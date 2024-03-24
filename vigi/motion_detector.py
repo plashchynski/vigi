@@ -111,7 +111,7 @@ class MotionDetector():
         detected_objects = set()
         if self.motion_detected:
             if self.object_detection_model:
-                results = self.object_detection_model(original_frame, device=self.inference_device, verbose=False)
+                results = self.object_detection_model(original_frame, device = self.inference_device, verbose = self.debug)
 
                 for result in results:
                     # move to cpu

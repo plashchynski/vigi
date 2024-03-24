@@ -202,7 +202,8 @@ def main():
             motion_detector = MotionDetector(
                 object_detection_model = object_detection_model,
                 sensitivity = camera_config.sensitivity,
-                inference_device = app.configuration_manager.inference_device
+                inference_device = app.configuration_manager.inference_device,
+                debug=app.configuration_manager.debug
             )
 
             # create a camera monitor for each camera
