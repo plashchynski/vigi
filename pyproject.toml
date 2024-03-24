@@ -34,6 +34,7 @@ dependencies = [
   "humanize == 4.9.0",
   "twilio == 9.0.2",
   "platformdirs == 4.2.0",
+  "Flask-HTTPAuth" == 4.8.0",
 ]
 
 [project.scripts]

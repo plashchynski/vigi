@@ -43,6 +43,9 @@ def read_args():
     parser.add_argument("--detection-model-file", help="Path to the detection model file (YOLO's yolov8n.pt, by default)", type=str)
     parser.add_argument("--disable-detection", help="Disable object detection", action='store_true')
     parser.add_argument("--inference-device", help="Inference device for object detection (cpu or cuda)", type=str)
+    parser.add_argument("--http-basic-username", help="Username for HTTP basic authentication. Disabled by default", type=str)
+    parser.add_argument("--http-basic-password", help="Password for HTTP basic authentication", type=str)
+    parser.add_argument("--http-basic-hash", help="Hashed password for HTTP basic authentication", type=str)
     args = parser.parse_args()
     return args
 

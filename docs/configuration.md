@@ -32,6 +32,11 @@ The following command line arguments are available:
 
 `--inference-device` — "cuda" or "cpu". By default it detects automatically if GPU is available. If not, it uses CPU.
 
+`--http-basic-username` — Username for HTTP Basic Authentication for the web console.
+
+`--http-basic-password` — Password for HTTP Basic Authentication for the web console.
+
+`--http-basic-hashed-password` — Hashed password for HTTP Basic Authentication for the web console. This is a more secure way to store the password in the configuration file. Use `scripts/generate_password.py` to generate the hashed password.
 
 ## Configuration file
 
@@ -54,6 +59,14 @@ The configuration file is an INI file with the following sections:
 `DisableDetection` - Disable object detection. Use it if detection is too slow for you hardware.
 
 `InferenceDevice` - "cuda" or "cpu". By default it detects automatically if GPU is available. If not, it uses CPU.
+
+HTTP Basic Authentication for the web console:
+
+`HttpBasicUsername` - Username for HTTP Basic Authentication for the web console.
+
+`HttpBasicPassword` - Password for HTTP Basic Authentication for the web console.
+
+`HttpBasicHashedPassword` - Hashed password for HTTP Basic Authentication for the web console. This is a more secure way to store the password in the configuration file. Use `scripts/generate_password.py` to generate the hashed password.
 
 The following settings are for Email notifications:
 

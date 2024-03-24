@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Added
 
 - The `--disable-detection` option to disable object detection if it is not needed or too slow.
+- HTTP Basic Authentication for the web console.
 
 # [0.9.1] - 2024-03-22
 

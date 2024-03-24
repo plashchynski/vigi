@@ -22,6 +22,9 @@ class ConfigurationManager:
         self.detection_model_file = os.path.join(user_data_dir('vigi-agent', 'Vigi'), 'yolov8n.pt')
         self.disable_detection = False
         self.inference_device = 'cpu'
+        self.http_basic_username = None
+        self.http_basic_password = None
+        self.http_basic_hashed_password = None
 
         # detect if cuda is available
         if torch.cuda.is_available():
@@ -84,6 +87,10 @@ class ConfigurationManager:
             self.set_disable_detection(True)
         if cmd_args.inference_device:
             self.set_inference_device(cmd_args.inference_device)
+        if cmd_args.http_basic_username:
+            self.http_basic_username = cmd_args.http_basic_username
+        if cmd_args.http_basic_password:
+            self.http_basic_password = cmd_args.http_basic_password
 
         # configure at leas one camera
         camera_id = 0
@@ -129,6 +136,12 @@ class ConfigurationManager:
             self.set_disable_detection(default_config['DisableDetection'] == 'True')
         if 'InferenceDevice' in default_config:
             self.set_inference_device(default_config['InferenceDevice'])
+        if 'HttpBasicUsername' in default_config:
+            self.http_basic_username = default_config['HttpBasicUsername']
+        if 'HttpBasicPassword' in default_config:
+            self.http_basic_password = default_config['HttpBasicPassword']
+        if 'HttpBasicHashedPassword' in default_config:
+            self.http_basic_hashed_password = default_config['HttpBasicHashedPassword']
 
         # SMTP configuration
         if 'smtpServer' in default_config:
