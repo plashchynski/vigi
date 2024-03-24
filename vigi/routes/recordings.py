@@ -1,3 +1,7 @@
+"""
+This module contains the flask blueprint for the recordings page.
+"""
+
 import os
 import logging
 from pathlib import Path
@@ -14,6 +18,9 @@ recordings_blueprint = Blueprint('recordings', __name__)
 @recordings_blueprint.route('/recordings/<camera_id>/<date>/<time>/preview')
 @cache.cached(timeout=24*60*60) # Cache the preview for 24 hours as it's a unlikely to change
 def preview(camera_id, date, time):
+    """
+    Returns the preview image for the given camera_id, date and time
+    """
     video_path = _video_file_path(camera_id, date, time)
 
     if not os.path.exists(video_path):
@@ -46,9 +53,9 @@ def video(camera_id, date, time):
 
     if not os.path.exists(video_path):
         return "Video not found", 404
-    
+
     # if download=true is in the query string, the video will be downloaded
-    as_attachment = (request.args.get("download") == "true")
+    as_attachment = request.args.get("download") == "true"
 
     return send_file(video_path, as_attachment=as_attachment)
 
@@ -56,7 +63,10 @@ def video(camera_id, date, time):
 # delete recording
 @recordings_blueprint.route('/recordings/<camera_id>/<date>/<time>/delete', methods=['DELETE'])
 def delete(camera_id, date, time):
-    logging.info(f"Deleting recording: {camera_id}/{date}/{time}")
+    """
+    Deletes the recording for the given camera_id, date and time
+    """
+    logging.info("Deleting recording: %s/%s/%s", camera_id, date, time)
     database = Database(current_app.configuration_manager.db_path)
     video_path = _video_file_path(camera_id, date, time)
 
@@ -74,6 +84,9 @@ def delete(camera_id, date, time):
 
 @recordings_blueprint.route('/recordings')
 def index():
+    """
+    Returns a list of all recordings
+    """
     database = Database(current_app.configuration_manager.db_path)
     recording_path = current_app.configuration_manager.data_dir
 
@@ -84,7 +97,7 @@ def index():
         return render_template('recordings/index.html', recording_dates=[])
 
     # get all unique recording dates from file names and sort them
-    recording_dates = set([os.path.basename(Path(file).parent) for file in recordings])
+    recording_dates = {os.path.basename(Path(file).parent) for file in recordings}
     recording_dates = list(recording_dates)
     recording_dates.sort(reverse=True)
 

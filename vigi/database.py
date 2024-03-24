@@ -1,9 +1,14 @@
-# This file contains the Database class which is used to interact with the SQLite database
+"""
+This file contains the Database class which is used to interact with the SQLite database
+"""
 
 import logging
 import sqlite3
 
 class Database:
+    """
+    The Database class is used to interact with the SQLite database
+    """
     def __init__(self, db_path):
         """
         Initialize the database connection
@@ -35,8 +40,8 @@ class Database:
         create the database file if it does not exist
         create the table if it does not exist
         """
-        logging.info(f"Initalizing database at {self.db_path}")
-        self.create_table_sql = """
+        logging.info("Initializing database at %s", self.db_path)
+        create_table_sql = """
         CREATE TABLE IF NOT EXISTS recordings (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             date TEXT NOT NULL,
@@ -45,17 +50,22 @@ class Database:
             tags TEXT
         );
         """
-        self.conn.execute(self.create_table_sql)
+        self.conn.execute(create_table_sql)
 
-        self.add_index = """
+        add_index_sql = """
         CREATE INDEX IF NOT EXISTS idx_recordings ON recordings (date, time, camera_id);
         """
-        self.conn.execute(self.add_index)
+        self.conn.execute(add_index_sql)
         logging.info("Database initialized")
 
     def add_recording(self, date, time, camera_id, tags):
-        logging.debug(f"Adding recording to database: {date} {time} {camera_id} {tags}")
-        self.conn.execute("INSERT INTO recordings (date, time, camera_id, tags) VALUES (?, ?, ?, ?)", (date, time, camera_id, tags))
+        """
+        Add a recording to the database
+        """
+        logging.debug("Adding recording to database: %s %s %s %s",
+                      date, time, camera_id, tags)
+        self.conn.execute("INSERT INTO recordings (date, time, camera_id, tags) VALUES (?, ?, ?, ?)",
+                          (date, time, camera_id, tags))
         self.conn.commit()
 
     def find_recording(self, date, time, camera_id):
@@ -65,8 +75,10 @@ class Database:
         time: str, the time in the format HH:MM:SS
         camera_id: int, the id of the camera
         """
-        logging.debug(f"Finding recording in database: {date}, {time}, {camera_id}")
-        cursor = self.conn.execute("SELECT * FROM recordings WHERE date = ? AND time = ? AND camera_id = ?", [date, time, camera_id])
+        logging.debug("Finding recording in database: %s, %s, %s",
+                      date, time, camera_id)
+        cursor = self.conn.execute("SELECT * FROM recordings WHERE date = ? AND time = ? AND camera_id = ?",
+                                   [date, time, camera_id])
         return cursor.fetchone()
 
     def delete_recording(self, date, time, camera_id):
@@ -76,11 +88,16 @@ class Database:
         time: str, the time in the format HH:MM:SS
         camera_id: int, the id of the camera
         """
-        logging.debug(f"Deleting recording from database: {date}, {time}, {camera_id}")
-        self.conn.execute("DELETE FROM recordings WHERE date = ? AND time = ? AND camera_id = ?", [date, time, camera_id])
+        logging.debug("Deleting recording from database: %s, %s, %s",
+                      date, time, camera_id)
+        self.conn.execute("DELETE FROM recordings WHERE date = ? AND time = ? AND camera_id = ?",
+                          [date, time, camera_id])
         self.conn.commit()
 
     def close(self):
+        """
+        Close the database connection
+        """
         logging.info("Closing database connection")
         self.conn.close()
         self.conn = None

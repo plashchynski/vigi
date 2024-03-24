@@ -1,16 +1,20 @@
-# This file contains tests for the motion detector module and aims to verify that the motion detector
-# is able to distinguish between videos that contain real motion and videos that do not contain any real motion
+"""
+This file contains tests for the motion detector module and aims to verify that
+the motion detector is able to distinguish between videos that contain real motion
+and videos that do not contain any real motion
 
-# The tests are based on sample videos that are located in the samples directory
-# The samples directory contains two subdirectories: positive and negative
-# The positive directory contains videos that contain real motion
-# The negative directory contains videos that do not contain any real motion, but rather static scenes
-# with some noise or light changes
+The tests are based on sample videos that are located in the samples directory
+The samples directory contains two subdirectories: positive and negative
+The positive directory contains videos that contain real motion
+The negative directory contains videos that do not contain any real motion, but
+rather static scenes with some noise or light changes
+"""
 
-import cv2
 import os
 from glob import glob
 import unittest
+
+import cv2
 
 from vigi.motion_detector import MotionDetector
 
@@ -18,19 +22,26 @@ from vigi.motion_detector import MotionDetector
 class FileProcessor:
     """
     This class is responsible for processing video files and testing them for motion
-    if motion is detected, the process method should return True, otherwise it should return False
+    if motion is detected, the process method should return True, otherwise it should
+    return False
     """
     def __init__(self, file_path):
         self.file_path = file_path
         self.motion_detected = False
-    
+
     def motion_callback(self):
+        """
+        This method is called when motion is detected
+        """
         self.motion_detected = True
 
     def process(self):
+        """
+        Process the video file and test it for motion
+        """
         cap = cv2.VideoCapture(self.file_path)
 
-        motion_detector = MotionDetector(self.motion_callback, model_file='yolov8n.pt')
+        motion_detector = MotionDetector(self.motion_callback)
 
         while True:
             # read frames from the sample video
@@ -42,9 +53,15 @@ class FileProcessor:
 
 
 class MotionDetectorTestCase(unittest.TestCase):
+    """
+    Test the motion detector module
+    """
     def test_motion_detection(self):
-        # negative samples are videos that do not contain any real motion, but rather static scenes
-        # with some noise or light changes
+        """
+        negative samples are videos that do not contain any real motion, but rather static scenes
+        with some noise or light changes
+        """
+
         for file in glob(os.path.join(os.path.dirname(__file__), 'samples', 'negative', '*')):
             print(f"File {file} should not contain any motion.")
             processor = FileProcessor(file)

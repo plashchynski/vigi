@@ -1,9 +1,15 @@
-# This file contains the SMSNotificationProvider class, which is responsible for sending SMS notifications.
+"""
+This file contains the SMSNotificationProvider class, which is
+responsible for sending SMS notifications.
+"""
 import logging
 
 from twilio.rest import Client
 
 class SMSNotificationProvider:
+    """
+    The SMSNotificationProvider class is responsible for sending SMS notifications.
+    """
     def __init__(self, account_sid: str, auth_token: str, from_number: str,
                  recipient_phone_numbers: list):
         """
@@ -28,7 +34,8 @@ class SMSNotificationProvider:
         """
         Send SMS to a single recipient
         """
-        logging.info(f"Sending SMS from {self.from_number} to {recipient_phone_number} with text: {notification_text}")
+        logging.info("Sending SMS from %s to %s with text: %s",
+                     self.from_number, recipient_phone_number, notification_text)
         self.client.messages.create(
             body = notification_text,
             from_ = self.from_number,

@@ -1,6 +1,8 @@
-# This file is the entry point of the application. It reads the configuration file
-# and the command line arguments, initializes the logger, the notifier, the video recorder
-# and the camera monitor, and starts the Flask web server.
+"""
+This file is the entry point of the application. It reads the configuration file
+and the command line arguments, initializes the logger, the notifier, the video recorder
+and the camera monitor, and starts the Flask web server.
+"""
 
 import os
 import argparse
@@ -32,20 +34,39 @@ def read_args():
     read the command line arguments
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument("--debug", help="Enable debug mode", action='store_true')
-    parser.add_argument("--no-monitor", help="Disable the camera monitor", action='store_true')
-    parser.add_argument("--data-dir", help="Directory to store the recordings", type=str)
+    parser.add_argument("--debug",
+                        help="Enable debug mode", action='store_true')
+    parser.add_argument("--no-monitor",
+                        help="Disable the camera monitor", action='store_true')
+    parser.add_argument("--data-dir",
+                        help="Directory to store the recordings", type=str)
     parser.add_argument("--camera-id", help="Camera ID to monitor", type=int)
-    parser.add_argument("--host", help="Host to run the web server", type=str)
-    parser.add_argument("--port", help="Port to run the web server", type=int)
-    parser.add_argument("--max-errors", help="Maximum number of consecutive errors when reading a frame from the camera", type=int)
-    parser.add_argument("--sensitivity", help="Sensitivity of the motion detector, should be a float between 0 and 1", type=float)
-    parser.add_argument("--detection-model-file", help="Path to the detection model file (YOLO's yolov8n.pt, by default)", type=str)
-    parser.add_argument("--disable-detection", help="Disable object detection", action='store_true')
-    parser.add_argument("--inference-device", help="Inference device for object detection (cpu or cuda)", type=str)
-    parser.add_argument("--http-basic-username", help="Username for HTTP basic authentication. Disabled by default", type=str)
-    parser.add_argument("--http-basic-password", help="Password for HTTP basic authentication", type=str)
-    parser.add_argument("--http-basic-hash", help="Hashed password for HTTP basic authentication", type=str)
+    parser.add_argument("--host",
+                        help="Host to run the web server", type=str)
+    parser.add_argument("--port",
+                        help="Port to run the web server", type=int)
+    parser.add_argument("--max-errors",
+                        help="Maximum number of consecutive errors when \
+                            reading a frame from the camera",
+                        type=int)
+    parser.add_argument("--sensitivity",
+                        help="Sensitivity of the motion detector, \
+                            should be a float between 0 and 1",
+                        type=float)
+    parser.add_argument("--detection-model-file",
+                        help="Path to the detection model file (YOLO's yolov8n.pt, by default)",
+                        type=str)
+    parser.add_argument("--disable-detection",
+                        help="Disable object detection", action='store_true')
+    parser.add_argument("--inference-device",
+                        help="Inference device for object detection (cpu or cuda)", type=str)
+    parser.add_argument("--http-basic-username",
+                        help="Username for HTTP basic authentication. \
+                            Disabled by default", type=str)
+    parser.add_argument("--http-basic-password",
+                        help="Password for HTTP basic authentication", type=str)
+    parser.add_argument("--http-basic-hash",
+                        help="Hashed password for HTTP basic authentication", type=str)
     args = parser.parse_args()
     return args
 
@@ -59,14 +80,14 @@ def read_config():
     ini.read('vigi.ini')
     default = ini['DEFAULT']
     logging.info("Configuration file read successfully.")
-    logging.debug(f"Default Configuration: {dict(default)}")
+    logging.debug("Default Configuration: %s", dict(default))
 
     camera_configs = []
     for section in ini.sections():
         # read the configuration from each camera
         if section.startswith('CAMERA'):
             camera_config = ini[section]
-            logging.debug(f"Camera configuration: {dict(camera_config)}")
+            logging.debug("Camera configuration: %s", dict(camera_config))
             camera_configs.append(camera_config)
 
     return default, camera_configs
@@ -123,15 +144,18 @@ def ensure_model_file() -> str:
     if app.configuration_manager.disable_detection:
         # we don't need the detection model file if the detection is disabled
         return None
-    
+
     # check if the detection model file exists
     if os.path.exists(app.configuration_manager.detection_model_file):
-        logging.info(f"Use detection model file: {app.configuration_manager.detection_model_file}")
+        logging.info("Use detection model file: %s",
+                     app.configuration_manager.detection_model_file)
     else:
-        logging.info(f"Detection model file does not exist: {app.configuration_manager.detection_model_file}")
+        logging.info("Detection model file does not exist: %s",
+                     app.configuration_manager.detection_model_file)
         # download the detection model file
         logging.info("Downloading the detection model file... ")
-        urllib.request.urlretrieve(DEFAULT_MODEL_URL, app.configuration_manager.detection_model_file)
+        urllib.request.urlretrieve(DEFAULT_MODEL_URL,
+                                   app.configuration_manager.detection_model_file)
         logging.info("Detection model file downloaded successfully.")
 
     return app.configuration_manager.detection_model_file
@@ -148,6 +172,9 @@ def graceful_exit():
     logging.info("Application exited successfully.")
 
 def main():
+    """
+    The main entry point of the application.
+    """
     # Initialize the configuration with the default values
     app.configuration_manager = ConfigurationManager()
 
@@ -167,7 +194,8 @@ def main():
 
     # create data dir if it does not exist
     if not os.path.exists(app.configuration_manager.data_dir):
-        logging.info(f"Data directory does not exist, creating: {app.configuration_manager.data_dir}")
+        logging.info("Data directory does not exist, creating: %s",
+                     app.configuration_manager.data_dir)
         os.makedirs(app.configuration_manager.data_dir)
 
     notifier = init_notifier(app.configuration_manager)
@@ -177,7 +205,7 @@ def main():
     database.init_db()
     database.integrity_check()
 
-    # close the database connection after initializing the database 
+    # close the database connection after initializing the database
     # as it's not used in the main thread
     database.close()
     logging.info("Database initialized successfully.")
@@ -198,7 +226,10 @@ def main():
 
             object_detection_model = None
             if object_detection_model_path:
-                logging.info(f"Initializing the object detection model with YOLO weights {object_detection_model_path} on device {app.configuration_manager.inference_device}... ")
+                logging.info("Initializing the object detection model with "
+                             "YOLO weights %s on device %s... ",
+                             object_detection_model_path,
+                             app.configuration_manager.inference_device)
                 object_detection_model = YOLO(object_detection_model_path)
 
             # create a motion detector for each camera
@@ -210,7 +241,7 @@ def main():
             )
 
             # create a camera monitor for each camera
-            logging.info(f"Starting the camera monitor for camera {camera_id}... ")
+            logging.info("Starting the camera monitor for camera %s...", camera_id)
             camera_monitor = CameraMonitor(
                 video_recorder = video_recorder,
                 camera_id = camera_id,
@@ -221,7 +252,7 @@ def main():
             )
             camera_monitor.start()
             app.camera_monitors[camera_id] = camera_monitor
-            logging.info(f"Camera monitor for camera {camera_id} started successfully.")
+            logging.info("Camera monitor for camera %s started successfully.", camera_id)
 
     # register the graceful_exit function to be called when the application exits
     atexit.register(graceful_exit)
@@ -235,4 +266,5 @@ def main():
         flask_debug = True
         logging.warning("Flask debug mode is enabled.")
 
-    app.run(host=app.configuration_manager.host, port=app.configuration_manager.port, debug=flask_debug)
+    app.run(host=app.configuration_manager.host,
+            port=app.configuration_manager.port, debug=flask_debug)

@@ -1,0 +1,34 @@
+************* Module vigi.camera_monitor
+vigi/camera_monitor.py:17:0: R0902: Too many instance attributes (17/7) (too-many-instance-attributes)
+vigi/camera_monitor.py:22:4: R0913: Too many arguments (8/5) (too-many-arguments)
+************* Module vigi.configuration_manager
+vigi/configuration_manager.py:171:0: C0301: Line too long (101/100) (line-too-long)
+vigi/configuration_manager.py:12:0: R0902: Too many instance attributes (15/7) (too-many-instance-attributes)
+vigi/configuration_manager.py:77:4: C0116: Missing function or method docstring (missing-function-docstring)
+vigi/configuration_manager.py:81:4: C0116: Missing function or method docstring (missing-function-docstring)
+vigi/configuration_manager.py:87:4: C0116: Missing function or method docstring (missing-function-docstring)
+vigi/configuration_manager.py:87:4: R0912: Too many branches (13/12) (too-many-branches)
+vigi/configuration_manager.py:126:4: C0116: Missing function or method docstring (missing-function-docstring)
+vigi/configuration_manager.py:131:12: W0707: Consider explicitly re-raising using 'except Exception as exc' and 'raise ValueError('Inference device is not valid') from exc' (raise-missing-from)
+vigi/configuration_manager.py:136:4: R0912: Too many branches (18/12) (too-many-branches)
+************* Module vigi.context_processors
+vigi/context_processors.py:32:11: R1735: Consider using '{"format_time": format_time, "format_duration": format_duration, "format_date": format_date, ... }' instead of a call to 'dict'. (use-dict-literal)
+************* Module vigi.database
+vigi/database.py:67:0: C0301: Line too long (101/100) (line-too-long)
+vigi/database.py:80:0: C0301: Line too long (108/100) (line-too-long)
+************* Module vigi.motion_detector
+vigi/motion_detector.py:11:0: R0902: Too many instance attributes (9/7) (too-many-instance-attributes)
+vigi/motion_detector.py:48:4: R0914: Too many local variables (25/15) (too-many-locals)
+vigi/motion_detector.py:131:8: R1702: Too many nested blocks (6/5) (too-many-nested-blocks)
+vigi/motion_detector.py:48:4: R0912: Too many branches (18/12) (too-many-branches)
+************* Module vigi.notification_providers.email_notification_provider
+vigi/notification_providers/email_notification_provider.py:14:4: R0913: Too many arguments (7/5) (too-many-arguments)
+vigi/notification_providers/email_notification_provider.py:10:0: R0903: Too few public methods (1/2) (too-few-public-methods)
+************* Module vigi.notification_providers.sms_notification_provider
+vigi/notification_providers/sms_notification_provider.py:9:0: R0903: Too few public methods (1/2) (too-few-public-methods)
+************* Module vigi.notifier
+vigi/notifier.py:9:0: R0903: Too few public methods (1/2) (too-few-public-methods)
+
+------------------------------------------------------------------
+Your code has been rated at 9.80/10 (previous run: 9.80/10, +0.00)
+

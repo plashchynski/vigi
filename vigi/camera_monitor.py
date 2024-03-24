@@ -1,3 +1,7 @@
+"""
+A module that implements the CameraMonitor class.
+"""
+
 import threading
 from datetime import datetime
 import time
@@ -12,16 +16,19 @@ from .database import Database
 
 class CameraMonitor(threading.Thread):
     """
-    A class that monitors the camera for motion and publishes the video stream from the camera.
+    A class that monitors one camera for motion.
     """
 
-    def __init__(self, video_recorder = None, camera_id=0, max_errors=50, add_seconds_after_motion=10,
-                 notifier=None, db_path=None, motion_detector=None):
+    def __init__(self, video_recorder = None, camera_id=0, max_errors=50,
+                 add_seconds_after_motion=10, notifier=None, db_path=None,
+                 motion_detector=None):
         """
-        max_errors: int - the maximum number of consecutive errors when reading a frame from the camera
-                            before the camera monitor stops. It's used to prevent the camera monitor from
-                            creating a big number of small recordings on each small motion.
-        add_seconds_after_motion: int - the number of seconds to add to the video after the motion is detected
+        max_errors: int - the maximum number of consecutive errors when reading
+                            a frame from the camera before the camera monitor stops.
+                            It's used to prevent the camera monitor from creating
+                            a big number of small recordings on each small motion.
+        add_seconds_after_motion: int - the number of seconds to add to the
+                            video after the motion is detected
         notifier: Notifier - a notifier object to send notifications about the motion
         db_path: str - the path to the database file
         """
@@ -65,22 +72,36 @@ class CameraMonitor(threading.Thread):
         # the same thread where it's used, but __init__ is called in the main thread
         self.db_path = db_path
 
+        # the database connection, it will be initialized in the run method
+        self.database = None
+
+        # camera parameters, they will be initialized in the run method
+        self.frame_width = None
+        self.frame_height = None
+        self.camera_fps = None
+
     def current_fps(self):
         """
         Returns the current FPS of the system using the FPS calculator if it has calculated the FPS,
         otherwise returns the FPS of the camera.
         """
         fps = self.fps_calculator.current_fps()
-        logging.info(f"Calculated FPS = {fps}")
+        logging.info("Calculated FPS = %s", fps)
         if fps is None:
             fps = int(self.camera_fps)
-            logging.warning(f"FPS is not calculated yet, using the camera's FPS = {fps}")
+            logging.warning("FPS is not calculated yet, using the camera's FPS = %s", fps)
 
-        # TODO: Set default FPS to 30 if the FPS from the camera is 1 or otherwize invalid
+        if fps == 1:
+            logging.warning("The camera's FPS is 1, it seems to be invalid."
+                            "Setting the default FPS to 30.")
+            fps = 30
 
         return fps
 
     def motion_callback(self):
+        """
+        This function is called when motion is detected by the motion detector.
+        """
         logging.info("Motion detected!")
 
         # send a notification about the motion
@@ -91,7 +112,7 @@ class CameraMonitor(threading.Thread):
         if self.video_recorder.is_recording():
             logging.info("Motion detected while the video is being recorded.")
             return
-    
+
         # reset the set of detected objects
         self.detected_objects = set()
 
@@ -100,11 +121,13 @@ class CameraMonitor(threading.Thread):
         # if FPS will be overestimated, the video will be played faster than it should be
         # if FPS will be underestimated, the video will be played slower than it should be
         # Start recording the video:
-        self.video_recorder.start_recording(frame_width=self.frame_width, frame_height=self.frame_height,
+        self.video_recorder.start_recording(frame_width=self.frame_width,
+                                            frame_height=self.frame_height,
                                             fps=self.current_fps())
 
     def run(self):
-        # Connect to the database. We need to connect to the database in the same thread where it's used
+        # Connect to the database. We need to connect to the database in the same
+        # thread where it's used
         self.database = Database(self.db_path)
 
         # Initialize the camera with OpenCV
@@ -113,14 +136,16 @@ class CameraMonitor(threading.Thread):
         if camera.isOpened():
             logging.info("Camera opened successfully.")
         else:
-            logging.error(f"Camera with ID={self.camera_id} could not be opened.")
+            logging.error("Camera with ID=%s could not be opened.", self.camera_id)
             return
 
         try:
             self.frame_width = camera.get(cv2.CAP_PROP_FRAME_WIDTH)
             self.frame_height = camera.get(cv2.CAP_PROP_FRAME_HEIGHT)
             self.camera_fps = camera.get(cv2.CAP_PROP_FPS)
-            logging.info(f"Camera parameters: frame width: {self.frame_width}, frame height: {self.frame_height}, FPS: {self.camera_fps}")
+            logging.info("Camera parameters: "
+                         "frame width: %s, frame height: %s, FPS: %s",
+                         self.frame_width, self.frame_height, self.camera_fps)
 
             error_count = 0
             while not self.should_stop:
@@ -136,10 +161,12 @@ class CameraMonitor(threading.Thread):
 
                     error_count += 1
                     if error_count >= self.max_errors:
-                        logging.fatal(f"Maximum number of consecutive errors ({self.max_errors}) reached. Exiting.")
+                        logging.fatal("Maximum number of consecutive errors (%s) reached. "
+                                      "Exiting.", self.max_errors)
                         break
 
-                    logging.error(f"Failed to read a frame from the camera with ID={self.camera_id}")
+                    logging.error("Failed to read a frame from the camera with ID=%s",
+                                  self.camera_id)
                     time.sleep(1)
                     continue
 
@@ -155,14 +182,17 @@ class CameraMonitor(threading.Thread):
                 # Publish the frame to the frame stream
                 self.frame_stream.publish(frame)
 
-                # if motion is not detected anymore and the video is being recorded, then stop the recording
-                if not self.motion_detector.is_motion_detected() and self.video_recorder.is_recording():
+                # if motion is not detected anymore and the video is being recorded, then
+                # stop the recording
+                if not self.motion_detector.is_motion_detected() and \
+                        self.video_recorder.is_recording():
                     self.add_frames -= 1
                     if self.add_frames <= 0:
                         self.end_recording()
 
-                # here we send all frames to the video recorder, it's up to the video recorder to decide if
-                # it should record the frame or not. It could decide to record additional frames before and after
+                # here we send all frames to the video recorder, it's up to the
+                # video recorder to decide if it should record the frame or not.
+                # It could decide to record additional frames before and after
                 # the motion is detected
                 self.video_recorder.add_frame(frame)
                 self.fps_calculator.update()
@@ -187,9 +217,11 @@ class CameraMonitor(threading.Thread):
                                     camera_id=self.camera_id, tags=','.join(self.detected_objects))
 
         # send a notification about the detected objects
-        self.notifier.notify(f"Moving objects detected: {', '.join(self.detected_objects)} by the camera #{self.camera_id}")
+        message = f"Moving objects detected: {', '.join(self.detected_objects)} " \
+                   "by the camera #{self.camera_id}"
+        self.notifier.notify(message)
 
-        self.video_recorder.еnd_recording()
+        self.video_recorder.end_recording()
 
     def stop(self):
         """

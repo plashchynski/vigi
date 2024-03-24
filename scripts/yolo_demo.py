@@ -1,5 +1,12 @@
-# The purpose of this script is to test the YOLO model and OpenCV with the camera feed
-# outside of the main application code. This is useful for debugging and testing the YOLO model.
+"""
+The purpose of this script is to test the YOLO model and OpenCV with the camera feed
+outside of the main application code. This is useful for debugging and testing the YOLO model.
+
+Usage:
+
+    python yolo_demo.py
+
+"""
 
 import cv2
 from ultralytics import YOLO
@@ -18,7 +25,8 @@ while True:
             label = result.names[int(cls)]
             x1, y1, x2, y2 = box
             cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
-            cv2.putText(frame, label, (int(x1), int(y1)), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+            cv2.putText(frame, label, (int(x1), int(y1)),
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
     cv2.imshow('frame', frame)
 

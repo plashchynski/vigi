@@ -1,4 +1,8 @@
-# This is the entry point for the Flask application.
+"""
+This is the entry point for the Flask application implementation of
+the ViGi web console. This module initializes the Flask app and
+registers the blueprints for the different views (pages).
+"""
 
 from flask_bootstrap import Bootstrap5
 from flask import Flask, redirect, url_for
@@ -32,9 +36,14 @@ app.register_blueprint(recordings_blueprint)
 @app.before_request
 @auth.login_required
 def before_request():
-    pass
+    """
+    This function is called before each request to the application.
+    """
 
 # the root route redirects to the live view
 @app.route('/')
 def index():
+    """
+    root route redirects to the live view
+    """
     return redirect(url_for('live.index'))

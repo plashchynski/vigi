@@ -1,3 +1,7 @@
+"""
+This module contains the routes for the live page.
+"""
+
 from datetime import datetime
 
 from flask import Blueprint, current_app, render_template
@@ -7,6 +11,9 @@ live_blueprint = Blueprint('live', __name__)
 # route for live
 @live_blueprint.route('/live')
 def index():
+    """
+    Returns the live page: list of cameras and their details.
+    """
     cameras = []
     if hasattr(current_app, 'camera_monitors'):
         for camera_id, camera_monitor in current_app.camera_monitors.items():

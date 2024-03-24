@@ -1,3 +1,7 @@
+"""
+This module contains utility functions for spatial operations.
+"""
+
 import numpy as np
 
 def boxes_intersect(box1, box2):

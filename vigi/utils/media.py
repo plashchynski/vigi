@@ -1,7 +1,10 @@
-# This module contains utility functions for working with media files.
+"""
+This module contains utility functions for working with media files.
+"""
+
+import random
 
 import cv2
-import random
 
 def read_video_file_meta(video_path):
     """
@@ -34,7 +37,7 @@ def generate_preview(video_path):
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():
         return None
-    
+
     # get the total number of frames in the video
     frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
@@ -48,7 +51,7 @@ def generate_preview(video_path):
     ret, frame = cap.read()
     if not ret:
         return None
-    
+
     cap.release()
 
     frame = cv2.resize(frame, (int(frame.shape[1] / 4), int(frame.shape[0] / 4)))

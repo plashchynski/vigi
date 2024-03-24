@@ -1,4 +1,6 @@
-# This file contains the EmailNotificationProvider class which is used to send email notifications
+"""
+This file contains the EmailNotificationProvider class which is used to send email notifications
+"""
 import logging
 
 import smtplib
@@ -6,8 +8,11 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 class EmailNotificationProvider:
-    def __init__(self, smtp_server: str, smtp_port: int, smtp_user: str, smtp_password: str, sender_email: str,
-                 recipient_emails: list):
+    """
+    The EmailNotificationProvider class is used to send email notifications
+    """
+    def __init__(self, smtp_server: str, smtp_port: int, smtp_user: str,
+                 smtp_password: str, sender_email: str, recipient_emails: list):
         """
         :param smtp_server: SMTP server address
         :param smtp_port: SMTP server port
@@ -22,7 +27,9 @@ class EmailNotificationProvider:
         self.smtp_password = smtp_password
         self.sender_email = sender_email
         self.recipient_emails = recipient_emails
-        logging.info(f"EmailNotificationProvider initialized with sender_email: {sender_email}, recipient_emails: {recipient_emails}")
+        logging.info("EmailNotificationProvider initialized with sender_email: %s, "
+                     "recipient_emails: %s",
+                     sender_email, recipient_emails)
 
     def notify(self, notification_text: str):
         """
@@ -35,7 +42,8 @@ class EmailNotificationProvider:
         """
         Send email to a single recipient
         """
-        logging.info(f"Sending email from {self.sender_email} to {recipient_email} with text: {notification_text}")
+        logging.info("Sending email from %s to %s with text: %s",
+                     self.sender_email, recipient_email, notification_text)
 
         message = MIMEMultipart()
         message["From"] = self.sender_email

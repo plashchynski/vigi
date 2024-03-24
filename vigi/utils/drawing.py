@@ -1,4 +1,6 @@
-# This file contains the utility function to draw different figures using OpenCV
+"""
+This file contains the utility function to draw different figures using OpenCV
+"""
 
 import cv2
 import numpy as np

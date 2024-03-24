@@ -1,4 +1,11 @@
-# A script to generate a hashed password for the user
+"""
+A script to generate a hashed password for the user
+
+Usage:
+
+    python generate_password.py
+
+"""
 
 from werkzeug.security import generate_password_hash
 

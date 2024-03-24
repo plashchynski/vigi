@@ -1,4 +1,6 @@
-# this class is used to validate and store the configuration of the agent
+"""
+This class is used to validate and store the configuration of the agent
+"""
 import os
 
 import torch
@@ -8,6 +10,9 @@ from platformdirs import user_data_dir
 from .camera_config import CameraConfig
 
 class ConfigurationManager:
+    """
+    This class is used to validate and store the configuration of the agent
+    """
     def __init__(self):
         # default configuration
         self.port = 5000
@@ -33,22 +38,30 @@ class ConfigurationManager:
         # detect if mps is available (Apple ARM chips)
         elif torch.backends.mps.is_available():
             self.set_inference_device('mps')
-        
+
 
     def set_port(self, port):
-        # validate the port
+        """
+        Set the port of the agent
+        """
         port = int(port)
         if port < 0 or port > 65535:
             raise ValueError('Port must be between 0 and 65535')
         self.port = port
-    
+
     def set_host(self, host):
+        """
+        Set the host of the agent
+        """
         # validate the host
         if host == '':
             raise ValueError('Host must not be empty')
         self.host = host
 
     def set_data_dir(self, data_dir):
+        """
+        Set the data directory of the agent
+        """
         # validate the data directory
         if data_dir == '':
             raise ValueError('Data directory must not be empty')
@@ -56,7 +69,9 @@ class ConfigurationManager:
         self.db_path = os.path.join(self.data_dir, 'vigi.db')
 
     def set_debug(self, debug):
-        # set the debug mode
+        """
+        Enable or disable debug mode
+        """
         self.debug = debug
 
     def set_disable_detection(self, disable_detection):
@@ -69,7 +84,7 @@ class ConfigurationManager:
 
         self.detection_model_file = detection_model_file
 
-    def update_from_args(self, cmd_args):        
+    def update_from_args(self, cmd_args):
         # update the configuration from the command line arguments
         if cmd_args.port:
             self.set_port(cmd_args.port)
@@ -119,7 +134,9 @@ class ConfigurationManager:
         self.inference_device = inference_device
 
     def update_from_config(self, default_config, camera_configs):
-        # update the configuration from the configuration file
+        """
+        Update the configuration from the configuration file
+        """
         if 'Port' in default_config:
             self.set_port(default_config['Port'])
         if 'Host' in default_config:
@@ -149,8 +166,8 @@ class ConfigurationManager:
 
             smtp_params = ['smtpServer', 'smtpPort', 'smtpUser', 'smtpPassword', 'senderEmail']
             for param in smtp_params:
-                self.smtp_server_config[param] = default_config[param]    
-            
+                self.smtp_server_config[param] = default_config[param]
+
             self.smtp_server_config['recipientEmails'] = default_config['recipientEmails'].split(',')
 
         if 'twilioAccountSid' in default_config:
@@ -159,7 +176,7 @@ class ConfigurationManager:
             twilio_params = ['twilioAccountSid', 'twilioAuthToken', 'twilioFromNumber']
             for param in twilio_params:
                 self.twilio_config[param] = default_config[param]
-            
+
             self.twilio_config['toNumbers'] = default_config['toNumbers'].split(',')
 
         for camera_config_info in camera_configs:
@@ -168,7 +185,7 @@ class ConfigurationManager:
 
             if 'MaxErrors' in camera_config_info:
                 camera_config.set_max_errors(camera_config_info['MaxErrors'])
-            
+
             if 'Sensitivity' in camera_config_info:
                 camera_config.set_sensitivity(camera_config_info['Sensitivity'])
 

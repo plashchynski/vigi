@@ -1,15 +1,23 @@
-# This file is used to calculate the FPS of the system to ensure that the video
-# metadata is accurate. The FPS is calculated by measuring the time it takes to
-# process a frame and then averaging the time over a number of frames.
+"""
+This file is used to calculate the FPS of the system to ensure that the video
+metadata is accurate. The FPS is calculated by measuring the time it takes to
+process a frame and then averaging the time over a number of frames.
+"""
 
-from collections import deque
 import time
+from collections import deque
 
 class FPSCalculator():
+    """
+    This class is used to calculate the FPS of the system. It keeps track of
+    the time it takes to process each frame and then averages the time over a
+    number of frames to calculate the FPS.
+    """
     def __init__(self, max_history_size=100, min_history_size=20):
         """
-        the max_history_size is the number of frames to keep in the history used to calculate the FPS,
-        the higher the number, the more accurate the FPS will be, but it will also be slower to react to changes
+        the max_history_size is the number of frames to keep in the history
+        used to calculate the FPS, the higher the number, the more accurate
+        the FPS will be, but it will also be slower to react to changes
         """
         self.min_history_size = min_history_size
         self.time_history = deque(maxlen=max_history_size)

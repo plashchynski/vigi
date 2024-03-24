@@ -1,3 +1,8 @@
+"""
+A simple publish-subscribe (PubSub) class that allows multiple subscribers to
+receive messages from a single publisher on a single topic.
+"""
+
 from queue import Queue
 import threading
 

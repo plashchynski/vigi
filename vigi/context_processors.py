@@ -1,10 +1,16 @@
-# This file contains the context processors for views
-# More info: https://flask.palletsprojects.com/en/3.0.x/templating/#context-processors
+"""
+This file contains the context processors for views
+More info: https://flask.palletsprojects.com/en/3.0.x/templating/#context-processors
+"""
 
 import datetime
 import humanize
 
 def utility_processor():
+    """
+    This function returns a dictionary of utility functions that
+    can be used in templates
+    """
     def format_time(time):
         # format time as HH:MM:SS
         return time.replace('-', ':')

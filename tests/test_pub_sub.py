@@ -1,20 +1,27 @@
+"""
+Tests for the PubSub class.
+"""
+
 import unittest
 import queue
 
 from vigi.utils.pub_sub import PubSub
 
 class TestPubSub(unittest.TestCase):
+    """
+    Test the PubSub class
+    """
     def test_single_subscription(self):
         """Test that a single subscriber receives messages."""
 
         pubsub = PubSub()
-        queue = pubsub.subscribe()
+        q = pubsub.subscribe()
 
         test_message = "Hello, World!"
         pubsub.publish(test_message)
 
-        self.assertEqual(queue.get(), test_message)
-        pubsub.unsubscribe(queue)
+        self.assertEqual(q.get(), test_message)
+        pubsub.unsubscribe(q)
 
 
     def test_multiple_subscriptions(self):
@@ -25,9 +32,9 @@ class TestPubSub(unittest.TestCase):
         test_message = "Hello, Multiworld!"
         pubsub.publish(test_message)
 
-        for queue in queues:
-            self.assertEqual(queue.get(), test_message)
-            pubsub.unsubscribe(queue)
+        for q in queues:
+            self.assertEqual(q.get(), test_message)
+            pubsub.unsubscribe(q)
 
     def test_unsubscribe(self):
         """Test that unsubscribing prevents receiving messages."""
@@ -35,7 +42,7 @@ class TestPubSub(unittest.TestCase):
         queue1 = pubsub.subscribe()
         queue2 = pubsub.subscribe()
         pubsub.unsubscribe(queue1)
-        
+
         test_message = "Test Unsubscribe"
         pubsub.publish(test_message)
 

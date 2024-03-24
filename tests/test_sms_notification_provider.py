@@ -1,10 +1,20 @@
+"""
+This file contains the unit tests for the SMSNotificationProvider class.
+"""
+
 import unittest
 from unittest.mock import patch, MagicMock
 from vigi.notification_providers.sms_notification_provider import SMSNotificationProvider
 
 class TestSMSNotificationProvider(unittest.TestCase):
+    """
+    Test the SMSNotificationProvider class
+    """
     @patch('vigi.notification_providers.sms_notification_provider.Client')
     def test_notify(self, mock_client):
+        """
+        notify should send a message to all recipient phone numbers
+        """
         # Initialize the mocked Twilio client
         mock_client_instance = MagicMock()
         mock_client.return_value = mock_client_instance

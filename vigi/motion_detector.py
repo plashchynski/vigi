@@ -1,3 +1,7 @@
+"""
+This module contains the MotionDetector class that is used to detect motion in a video stream.
+"""
+
 import cv2
 import numpy as np
 
@@ -5,7 +9,11 @@ from vigi.utils.spatial import boxes_intersect
 from vigi.utils.drawing import draw_bboxes, draw_bbox, draw_title
 
 class MotionDetector():
-    def __init__(self, object_detection_model=None, inference_device=None, debug=False, sensitivity=0.5):
+    """
+    The MotionDetector class is used to detect motion in a video stream.
+    """
+    def __init__(self, object_detection_model=None, inference_device=None,
+                 debug=False, sensitivity=0.5):
         """
         Initialize the motion detector with the given sensitivity and motion callback.
         The motion callback is called when motion is detected.
@@ -13,7 +21,8 @@ class MotionDetector():
         """
         self.sensitivity = sensitivity
         self.back_sub = cv2.createBackgroundSubtractorMOG2(
-            varThreshold=(50 / self.sensitivity), # the higher the sensitivity, the lower the threshold
+            # the higher the sensitivity, the lower the threshold
+            varThreshold=(50 / self.sensitivity),
             detectShadows=True
         )
         self.motion_callback = None
@@ -22,7 +31,8 @@ class MotionDetector():
         self.skip_frames_count = 50 # warming up frames count
         self.object_detection_model = object_detection_model
         self.inference_device = inference_device
-    
+        self.reset_motion_flag_after = 0
+
     def set_motion_callback(self, motion_callback):
         """
         Set the motion callback that will be called when motion is detected.
@@ -37,7 +47,8 @@ class MotionDetector():
 
     def update(self, frame):
         """
-        Update the motion detector with the current frame and return the frame with the motion detection overlay.
+        Update the motion detector with the current frame and return the
+        frame with the motion detection overlay.
         """
         original_frame = frame.copy()
 
@@ -57,7 +68,8 @@ class MotionDetector():
         # threshold the mask, the min_thresh value is set to 100 by default
         # this value roughly impacts the sensitivity of the motion detection
         min_thresh = 50 / self.sensitivity # the higher the sensitivity, the lower the threshold
-        _, motion_mask = cv2.threshold(fg_mask, thresh = min_thresh, maxval = 255, type = cv2.THRESH_BINARY)
+        _, motion_mask = cv2.threshold(fg_mask, thresh = min_thresh,
+                                       maxval = 255, type = cv2.THRESH_BINARY)
 
         # median blur to remove granular noise
         motion_mask = cv2.medianBlur(motion_mask, ksize = 3)
@@ -66,16 +78,20 @@ class MotionDetector():
         kernel = np.array((15,15), dtype=np.uint8)
 
         # morphologyEx with MORPH_OPEN is the same as erode followed by dilate
-        motion_mask = cv2.morphologyEx(motion_mask, op = cv2.MORPH_OPEN, kernel = kernel, iterations = 1)
+        motion_mask = cv2.morphologyEx(motion_mask, op = cv2.MORPH_OPEN,
+                                       kernel = kernel, iterations = 1)
 
         # morphologyEx with MORPH_CLOSE is the same as dilate followed by erode
-        motion_mask = cv2.morphologyEx(motion_mask, op = cv2.MORPH_CLOSE, kernel = kernel, iterations = 1)
+        motion_mask = cv2.morphologyEx(motion_mask, op = cv2.MORPH_CLOSE,
+                                       kernel = kernel, iterations = 1)
 
         # get contours of the moving objects in the frame
-        contours, _ = cv2.findContours(motion_mask, mode = cv2.RETR_EXTERNAL, method = cv2.CHAIN_APPROX_SIMPLE)
+        contours, _ = cv2.findContours(motion_mask, mode = cv2.RETR_EXTERNAL,
+                                       method = cv2.CHAIN_APPROX_SIMPLE)
         detections = []
 
-        cnt_area_thresh = (2500 / self.sensitivity) # the higher the sensitivity, the lower the are threshold
+        # the higher the sensitivity, the lower the are threshold
+        cnt_area_thresh = 2500 / self.sensitivity
         for cnt in contours:
             area = cv2.contourArea(cnt)
             if area > cnt_area_thresh:
@@ -83,10 +99,10 @@ class MotionDetector():
                 detections.append([x, y, x + w, y + h])
 
         detections = np.array(detections)
-        
+
         if len(detections) > 0:
             # Motion detected!
-            if self.motion_detected == False:
+            if self.motion_detected is False:
                 self.motion_detected = True
                 if self.motion_callback:
                     self.motion_callback()
@@ -104,14 +120,19 @@ class MotionDetector():
 
         if self.motion_detected:
             # draw red rectangle on frame
-            cv2.rectangle(original_frame, (0, 0), (original_frame.shape[1], original_frame.shape[0]), (0, 0, 255), 10)
+            cv2.rectangle(original_frame, (0, 0),
+                          (original_frame.shape[1], original_frame.shape[0]),
+                          (0, 0, 255), 10)
             # draw text on frame
-            cv2.putText(original_frame, 'MOTION DETECTED', (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+            cv2.putText(original_frame, 'MOTION DETECTED', (20, 40),
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
         detected_objects = set()
         if self.motion_detected:
             if self.object_detection_model:
-                results = self.object_detection_model(original_frame, device = self.inference_device, verbose = self.debug)
+                results = self.object_detection_model(original_frame,
+                                                      device = self.inference_device,
+                                                      verbose = self.debug)
 
                 for result in results:
                     # move to cpu

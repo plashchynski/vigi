@@ -1,3 +1,7 @@
+"""
+This module contains the camera routes blueprint.
+"""
+
 import cv2
 import numpy as np
 
@@ -47,6 +51,9 @@ def generate_frames(camera_monitor):
 # route for video streaming
 @camera_blueprint.route('/camera/<camera_id>/live')
 def camera(camera_id):
+    """
+    Returns the live video stream for the given camera_id.
+    """
     camera_id = int(camera_id)
     camera_monitor = None
     if hasattr(current_app, 'camera_monitors'):
@@ -55,4 +62,5 @@ def camera(camera_id):
         if camera_monitor is None:
             return Response("Camera monitor not found", status=404)
 
-    return Response(generate_frames(camera_monitor), mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(generate_frames(camera_monitor),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
