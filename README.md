@@ -130,7 +130,7 @@ python -m twine upload dist/*
 
 ## Run unit tests
 
-Download a samples dataset for the motion detection tests from [here](https://drive.google.com/file/d/16yQZuHf3xB-Z6zYG6lGxxMP1umbxlIYd/view?usp=sharing) and extract it to the `agent/tests` directory.
+Download a samples dataset for the motion detection tests from [here](https://vigi-statics.s3.us-west-2.amazonaws.com/samples.zip) and extract it to the `tests/` directory.
 
 Then run the tests:
 
