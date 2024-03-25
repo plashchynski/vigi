@@ -32,7 +32,8 @@ constant and does not change frequently.
 
 ```txt
 usage: vigi [-h] [--debug] [--no-monitor] [--data-dir DATA_DIR] [--camera-id CAMERA_ID] [--host HOST] [--port PORT] [--max-errors MAX_ERRORS]
-               [--sensitivity SENSITIVITY] [--detection-model-file DETECTION_MODEL_FILE] [--disable-detection]
+               [--sensitivity SENSITIVITY] [--detection-model-file DETECTION_MODEL_FILE] [--disable-detection] [--inference-device INFERENCE_DEVICE]
+               [--http-basic-username HTTP_BASIC_USERNAME] [--http-basic-password HTTP_BASIC_PASSWORD] [--http-basic-hash HTTP_BASIC_HASH]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -50,6 +51,14 @@ optional arguments:
   --detection-model-file DETECTION_MODEL_FILE
                         Path to the detection model file (YOLO's yolov8n.pt, by default)
   --disable-detection   Disable object detection
+  --inference-device INFERENCE_DEVICE
+                        Inference device for object detection (cpu or cuda)
+  --http-basic-username HTTP_BASIC_USERNAME
+                        Username for HTTP basic authentication. Disabled by default
+  --http-basic-password HTTP_BASIC_PASSWORD
+                        Password for HTTP basic authentication
+  --http-basic-hash HTTP_BASIC_HASH
+                        Hashed password for HTTP basic authentication
 ```
 
 You can configure additional cameras by adding a [CAMERAn] section to the `vigi.ini` file, where n is the camera ID. The only required parameter is the `CameraID`:
@@ -94,9 +103,6 @@ python -m venv .venv
 
 # Install the required packages
 pip install -r requirements.txt
-
-# Download a YOLOv8 nano model:
-wget https://github.com/ultralytics/assets/releases/download/v8.1.0/yolov8n.pt
 
 # run the agent
 python main.py

@@ -41,7 +41,8 @@ class FileProcessor:
         """
         cap = cv2.VideoCapture(self.file_path)
 
-        motion_detector = MotionDetector(self.motion_callback)
+        motion_detector = MotionDetector()
+        motion_detector.set_motion_callback(self.motion_callback)
 
         while True:
             # read frames from the sample video
