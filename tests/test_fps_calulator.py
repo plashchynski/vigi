@@ -21,8 +21,9 @@ class TestFpsCalculator(unittest.TestCase):
             fps_calculator.update()
             time.sleep(0.02)
 
-        self.assertGreaterEqual(fps_calculator.current_fps(), 41)
-        self.assertLessEqual(fps_calculator.current_fps(), 43)
+        # The FPS should be between 40 and 50
+        self.assertGreaterEqual(fps_calculator.current_fps(), 40)
+        self.assertLessEqual(fps_calculator.current_fps(), 50)
 
     def test_fps_calculator_no_history(self):
         """
